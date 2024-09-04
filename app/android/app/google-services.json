@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "993208229994",
+    "project_id": "daktarlamaraapp-e5934",
+    "storage_bucket": "daktarlamaraapp-e5934.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993208229994:android:28aefbfe46e66fbade2a13",
+        "android_client_info": {
+          "package_name": "dev.donmanuel.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnMIWiaQZUYnaYsry9LggVOTV7BlDTi1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
