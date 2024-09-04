@@ -1,3 +1,4 @@
+import 'package:app/routing/app_router.dart';
 import 'package:flutter/material.dart';
 
 class DaktarLamara extends StatefulWidget {
@@ -10,15 +11,8 @@ class DaktarLamara extends StatefulWidget {
 class _DaktarLamaraState extends State<DaktarLamara> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Daktar Lamara',
-      home: Scaffold(
-        body: Center(
-          child: Container(
-            child: const Text('Hello World'),
-          ),
-        ),
-      ),
+    return MaterialApp.router(
+      routerConfig: appRouter,
     );
   }
 }
