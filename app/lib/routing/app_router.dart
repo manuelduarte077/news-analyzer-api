@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../animations/custom_transition_page.dart';
+import '../features/animations/custom_transition_page.dart';
 import '../features/auth/auth.dart';
 import '../features/home/home_screen.dart';
 import '../features/splashscreen/presentation/splash_screen.dart';
@@ -23,7 +23,6 @@ final appRouter = GoRouter(
         );
       },
     ),
-
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) {
@@ -34,15 +33,25 @@ final appRouter = GoRouter(
       },
     ),
 
+    // Auth
     GoRoute(
-      path: '/auth',
+      path: '/sign-in',
       pageBuilder: (context, state) {
         return buildCustomTransitionPage(
           key: state.pageKey,
-          child: const AuthScreen(),
+          child: const SignInPage(),
         );
       },
     ),
-
+    // Auth
+    GoRoute(
+      path: '/sign-up',
+      pageBuilder: (context, state) {
+        return buildCustomTransitionPage(
+          key: state.pageKey,
+          child: const SignupPage(),
+        );
+      },
+    ),
   ],
 );

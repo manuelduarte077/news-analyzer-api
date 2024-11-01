@@ -11,27 +11,25 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
 
-    goToHome();
+    goToLogin();
   }
-
 
   /// Go to home screen
 
-  void goToHome() {
+  void goToLogin() {
     Future.delayed(const Duration(seconds: 2), () {
-      appRouter.go('/home');
+      appRouter.go('/sign-in');
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor:Colors.indigoAccent,
+      backgroundColor: Colors.indigoAccent,
       body: Center(
         child: CircularProgressIndicator.adaptive(),
       ),

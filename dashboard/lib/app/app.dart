@@ -5,11 +5,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Daktar Lamara',
-      home: Center(
-        child: Text('Hello World'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Daktar Lamara'),
+        ),
+        body: const Center(
+          child: Text('Welcome to Daktar Lamara'),
+        ),
       ),
     );
   }
