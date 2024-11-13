@@ -1,12 +1,60 @@
 import 'package:dashboard/features/clinica/clinica_detail_panel.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
+import 'data/clinica.dart';
+import 'widgets/add_clinica_form.dart';
+import 'widgets/card_clinica.dart';
+
+class Doctor {
+  final String nombre;
+  final String especialidad;
+  final String telefono;
+  final String email;
+
+  Doctor({
+    required this.nombre,
+    required this.especialidad,
+    required this.telefono,
+    required this.email,
+  });
+}
+
+class Coordenadas {
+  final double latitud;
+  final double longitud;
+
+  Coordenadas({
+    required this.latitud,
+    required this.longitud,
+  });
+}
+
+class Servicio {
+  final String nombre;
+  final String descripcion;
+
+  Servicio({
+    required this.nombre,
+    required this.descripcion,
+  });
+}
 
 class Clinica {
   final String nombre;
   final String ubicacion;
+  final String horarioAtencion;
+  final Coordenadas? coordenadas;
+  final List<Doctor> doctor;
+  final List<Servicio>? servicios;
 
-  Clinica({required this.nombre, required this.ubicacion});
+  Clinica({
+    required this.nombre,
+    required this.ubicacion,
+    required this.doctor,
+    this.coordenadas,
+    required this.horarioAtencion,
+    this.servicios,
+  });
 }
 
 class ClinicaListScreen extends StatefulWidget {
@@ -17,12 +65,6 @@ class ClinicaListScreen extends StatefulWidget {
 }
 
 class _ClinicaListScreenState extends State<ClinicaListScreen> {
-  final List<Clinica> clinicas = [
-    Clinica(nombre: 'Clínica San Pedro', ubicacion: 'Calle 1, Ciudad A'),
-    Clinica(nombre: 'Clínica Santa María', ubicacion: 'Avenida 5, Ciudad B'),
-    Clinica(nombre: 'Clínica del Sol', ubicacion: 'Calle 3, Ciudad C'),
-  ];
-
   Clinica? selectedClinica;
 
   @override
@@ -31,20 +73,59 @@ class _ClinicaListScreenState extends State<ClinicaListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Clínicas'),
+        centerTitle: true,
+        title: const Text(
+          'Lista de Clínicas',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
+        actions: [
+          selectedClinica != null
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: FilledButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
+                      backgroundColor: Colors.grey[200],
+                    ),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        showDragHandle: true,
+                        isScrollControlled: true,
+                        isDismissible: false,
+                        builder: (context) => const AddClinicaForm(),
+                      );
+                    },
+                    child: const Text(
+                      'Agregar Clínica',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ],
       ),
       body: Row(
         children: [
           Expanded(
             flex: 2,
             child: ListView.builder(
+              padding: EdgeInsets.zero,
               itemCount: clinicas.length,
               itemBuilder: (context, index) {
                 final clinica = clinicas[index];
 
-                return ListTile(
-                  title: Text(clinica.nombre),
-                  subtitle: Text(clinica.ubicacion),
+                return CardClinica(
+                  clinica: clinica.nombre,
+                  ubicacion: clinica.ubicacion,
                   selected: selectedClinica == clinica,
                   onTap: () {
                     setState(() {
@@ -62,43 +143,31 @@ class _ClinicaListScreenState extends State<ClinicaListScreen> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Agregar Clínica',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    const SizedBox(height: 20),
-                    const TextField(
-                      decoration: InputDecoration(labelText: 'Nombre'),
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(labelText: 'Ubicación'),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.pop();
-                      },
-                      child: const Text('Agregar Clínica'),
-                    ),
-                  ],
+      floatingActionButton: selectedClinica == null
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  isDismissible: false,
+                  builder: (context) => const AddClinicaForm(),
+                );
+              },
+              tooltip: 'Agregar Clínica',
+              label: const Text(
+                'Agregar Clínica',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
-              );
-            },
-          );
-        },
-        tooltip: 'Agregar Clínica',
-        child: const Icon(Icons.add),
-      ),
+              ),
+              icon: const Icon(
+                Icons.add,
+                size: 30,
+              ),
+            )
+          : null,
     );
   }
 }
