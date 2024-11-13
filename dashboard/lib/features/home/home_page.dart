@@ -20,8 +20,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _sections = [
     const MedicoListScreen(),
     MedicoFormScreen(),
-    const SettingsScreen(),
     const ClinicaListScreen(),
+    const SettingsScreen(),
   ];
 
   @override
@@ -52,7 +52,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Row(
         children: [
           if (!isMobile) _buildSidebar(),
-          Expanded(child: _sections[_selectedIndex]),
+          Expanded(
+            child: IndexedStack(
+              index: _selectedIndex,
+              children: _sections,
+            ),
+          ),
         ],
       ),
     );
@@ -80,8 +85,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final menuItems = [
       {'icon': Icons.list, 'title': 'Lista de Médicos'},
       {'icon': Icons.person_add, 'title': 'Crear Médico'},
-      {'icon': Icons.settings, 'title': 'Settings'},
       {'icon': Icons.local_hospital, 'title': 'Lista de Clínicas'},
+      {'icon': Icons.settings, 'title': 'Settings'},
     ];
 
     return List.generate(menuItems.length, (index) {
@@ -93,7 +98,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           setState(() {
             _selectedIndex = index;
           });
-          context.pop();
+          if (Navigator.canPop(context)) {
+            context.pop();
+          }
         },
       );
     });

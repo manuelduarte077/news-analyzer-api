@@ -123,6 +123,14 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Iniciar sesión',
+              style: TextStyle(
+                fontSize: isMobile ? 24 : 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 24.h),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -152,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   backgroundColor:
                       _isLoading ? Colors.grey : Theme.of(context).primaryColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: BorderRadius.circular(6.r),
                   ),
                 ),
                 child: _isLoading
