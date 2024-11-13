@@ -19,7 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _sections = [
     const MedicoListScreen(),
-    MedicoFormScreen(),
+    const MedicoFormScreen(),
     const ClinicaListScreen(),
     const SettingsScreen(),
   ];
