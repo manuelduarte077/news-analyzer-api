@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
                 ),
                 GoRoute(
                   path: '/home',
-                  builder: (context, state) => const HomePage(),
+                  builder: (context, state) => const DashboardScreen(),
                 ),
               ],
               redirect: (context, state) {
@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
                 alignment: Alignment.topRight,
               ),
               child: MaterialApp.router(
+                debugShowCheckedModeBanner: false,
                 routerConfig: router,
                 theme: AppTheme.light,
                 title: 'DaktarLamara Dashboard',
