@@ -60,7 +60,7 @@ class AppButtonView extends StatelessWidget {
             Text(
               text ?? '',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 color: textColor ?? AppColors.whiteColor,
               ),
             ),

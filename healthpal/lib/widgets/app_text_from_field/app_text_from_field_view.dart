@@ -85,9 +85,10 @@ class TextFormFieldCustom extends StatelessWidget {
               filled: true,
               fillColor: fillColor ?? Colors.transparent,
               hintStyle: const TextStyle(
-                  color: AppColors.silverColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18),
+                color: AppColors.silverColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+              ),
               disabledBorder: OutlineInputBorder(
                 borderRadius:
                     disabledBorderRadius ?? BorderRadius.circular(12.0),
