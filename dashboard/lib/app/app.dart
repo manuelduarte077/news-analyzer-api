@@ -8,6 +8,7 @@ import 'package:toastification/toastification.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/provider/auth_provider.dart';
 import '../features/home/home_page.dart';
+import '../features/medico/providers/medico_provider.dart';
 import '../features/splash/splash_screen.dart';
 
 class MyApp extends StatelessWidget {
@@ -17,8 +18,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       minTextAdapt: true,
-      child: ChangeNotifierProvider(
-        create: (context) => AuthProvider(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => AuthProvider()),
+          ChangeNotifierProvider(create: (_) => MedicoProvider()),
+        ],
         child: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
             final router = GoRouter(
