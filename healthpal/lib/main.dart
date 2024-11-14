@@ -39,12 +39,6 @@ void main() async {
     return true;
   };
 
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-    ),
-  );
-
   runApp(const MyApp());
 }
 
@@ -53,6 +47,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+
     return MaterialApp(
       theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
