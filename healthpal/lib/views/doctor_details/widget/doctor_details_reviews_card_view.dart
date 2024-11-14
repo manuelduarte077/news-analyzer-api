@@ -61,9 +61,9 @@ class DoctorDetailsReviewsCardView extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           const Text(
-            'Dr. Patel is a true professional who genuinely cares about his patients. I highly recommend Dr. Patel to anyone looking for quality care.',
+            'Dra.Pérez es un verdadero profesional que realmente se preocupa por sus pacientes. Recomiendo encarecidamente al Dr. Patel a cualquier persona que busque atención de calidad.',
             style: TextStyle(
-              fontSize: 16.0,
+              fontSize: 16,
             ),
           ),
         ],

@@ -16,46 +16,41 @@ class _AllHospitalListViewState extends State<AllHospitalListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            centerTitle: true,
-            backgroundColor: Colors.transparent,
-            title: const Text(
-              'All Hospitals',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.oxfordBlueColor,
-              ),
-            ),
+      appBar: AppBar(
+        title: const Text(
+          'Todos los hospitales',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.oxfordBlueColor,
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(10.0),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  TextFormFieldCustom(
-                    controller: addSearchController,
-                    hintText: 'Search Hospitals',
-                    prefixIcon: const Padding(
-                      padding: EdgeInsets.all(12.5),
-                      child: Icon(
-                        Icons.search,
-                        color: AppColors.silverColor,
-                      ),
-                    ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormFieldCustom(
+                controller: addSearchController,
+                hintText: 'Buscar hospitales',
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.all(12.5),
+                  child: Icon(
+                    Icons.search,
+                    color: AppColors.silverColor,
                   ),
-                  const SizedBox(
-                    height: 650,
-                    child: MyHospitalView(),
-                  ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 20),
+              const MyHospitalView(),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

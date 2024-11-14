@@ -36,7 +36,7 @@ class _MyBookingViewState extends State<MyBookingView>
             padding: EdgeInsets.only(top: 50.0),
             child: Center(
               child: Text(
-                'My Booking',
+                'Mis Reservas',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -54,9 +54,9 @@ class _MyBookingViewState extends State<MyBookingView>
             labelColor: Colors.black,
             unselectedLabelColor: Colors.grey,
             tabs: const [
-              Tab(text: 'Upcoming'),
-              Tab(text: 'Completed'),
-              Tab(text: 'Canceled'),
+              Tab(text: 'En Proceso'),
+              Tab(text: 'Completadas'),
+              Tab(text: 'Canceladas'),
             ],
           ),
           Expanded(

@@ -20,40 +20,40 @@ class _ProfileEditViewState extends State<ProfileEditView> {
   final List<Map<String, dynamic>> menuItems = [
     {
       'image': LocalImages.icEditProfileIcon,
-      'text': 'Edit Profile',
+      'text': 'Editar Perfil',
       'icon': LocalImages.icProfileEditArrowIcon,
       'deeplink': 'Edit Profile',
     },
     {
       'image': LocalImages.icFavoriteIcon,
-      'text': 'Favorite',
+      'text': 'Favoritos',
       'icon': LocalImages.icProfileEditArrowIcon,
       'deeplink': 'Favorite',
     },
     {
       'image': LocalImages.icNotificationIcon,
-      'text': 'Notifications',
+      'text': 'Notificaciones',
       'icon': LocalImages.icProfileEditArrowIcon,
       'deeplink': 'Notifications',
     },
     {
       'image': LocalImages.icSettingIcon,
-      'text': 'Settings',
+      'text': 'Configuración',
       'icon': LocalImages.icProfileEditArrowIcon,
     },
     {
       'image': LocalImages.icHelpAndSupportIcon,
-      'text': 'Help and Support',
+      'text': 'Ayuda y Soporte',
       'icon': LocalImages.icProfileEditArrowIcon,
     },
     {
       'image': LocalImages.icTermsAndConditionsIcon,
-      'text': 'Terms and Conditions',
+      'text': 'Términos y Condiciones',
       'icon': LocalImages.icProfileEditArrowIcon,
     },
     {
       'image': LocalImages.icLogoutIcon,
-      'text': 'Log Out',
+      'text': 'Cerrar Sesión',
       'deeplink': 'Log Out',
     },
   ];
@@ -66,7 +66,7 @@ class _ProfileEditViewState extends State<ProfileEditView> {
           const Padding(
             padding: EdgeInsets.only(top: 50.0),
             child: Text(
-              'Profile',
+              'Perfil',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class _ProfileEditViewState extends State<ProfileEditView> {
           const Padding(
             padding: EdgeInsets.only(top: 18.0),
             child: Text(
-              'Daniel Martinez',
+              'Manuel Duarte',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -114,7 +114,8 @@ class _ProfileEditViewState extends State<ProfileEditView> {
             ),
           ),
           const Text(
-            '+123 856479683',
+            // '+123 856479683',
+            '+505 5757 4486',
             style: TextStyle(
               fontSize: 14,
               color: AppColors.paleSkyColor,
@@ -125,6 +126,7 @@ class _ProfileEditViewState extends State<ProfileEditView> {
               itemCount: menuItems.length,
               itemBuilder: (context, index) {
                 final menuItem = menuItems[index];
+
                 return InkWell(
                   splashColor: Colors.transparent,
                   onTap: () {

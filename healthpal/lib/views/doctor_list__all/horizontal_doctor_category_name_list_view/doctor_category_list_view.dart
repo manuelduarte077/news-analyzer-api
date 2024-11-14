@@ -10,13 +10,14 @@ class DoctorCategoryListView extends StatefulWidget {
 
 class _DoctorCategoryListViewState extends State<DoctorCategoryListView> {
   int selectedIndex = 0;
+
   final List<String> items = [
-    'All',
+    'Todos',
     'General',
-    'Cardiologist',
-    'Dentist',
-    'Pulmonologist',
-    'Neurologist'
+    'Cardiólogo',
+    'Dentista',
+    'Neumólogo',
+    'Neurólogo'
   ];
 
   @override

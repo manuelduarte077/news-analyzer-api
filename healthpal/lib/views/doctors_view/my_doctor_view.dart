@@ -15,51 +15,77 @@ class _MyDoctorViewState extends State<MyDoctorView> {
   final List<Map<String, dynamic>> doctorDetails = [
     {
       'image': LocalImages.icFavoriteDoctor1Icon,
-      'name': 'Dr. David Patel',
-      'degree': 'Cardiologist',
-      'location': 'Cardiology Center, USA',
-      'rating': '5',
-      'review': '1,872 Reviews',
-      'isFavorite': false,
+      'name': 'Dr. Manuel Espinoza',
+      'degree': 'Pediatra',
+      'location': 'Hospital Primario Bilwi, Bilwi, Puerto Cabezas',
+      'rating': '4.7',
+      'review': '1,120 Reviews',
+      'isFavorite': true,
     },
     {
       'image': LocalImages.icFavoriteDoctor2Icon,
-      'name': 'Dr. David Patel',
-      'degree': 'Cardiologist',
-      'location': 'Cardiology Center, USA',
-      'rating': '5',
-      'review': '1,872 Reviews',
+      'name': 'Dra. Teresa Rivera',
+      'degree': 'Ginecóloga',
+      'location': 'Hospital Regional Nuevo Amanecer, Bluefields, RAAS',
+      'rating': '4.8',
+      'review': '980 Reviews',
       'isFavorite': false,
     },
     {
       'image': LocalImages.icFavoriteDoctor3Icon,
-      'name': 'Dr. David Patel',
-      'degree': 'Cardiologist',
-      'location': 'Cardiology Center, USA',
-      'rating': '5',
-      'review': '1,872 Reviews',
-      'isFavorite': false,
+      'name': 'Dr. José Baltodano',
+      'degree': 'Cardiólogo',
+      'location': 'Clínica Esperanza, Bluefields, RAAS',
+      'rating': '4.6',
+      'review': '1,450 Reviews',
+      'isFavorite': true,
     },
     {
       'image': LocalImages.icFavoriteDoctor4Icon,
-      'name': 'Dr. David Patel',
-      'degree': 'Cardiologist',
-      'location': 'Cardiology Center, USA',
-      'rating': '5',
-      'review': '1,872 Reviews',
+      'name': 'Dra. Rosa Zamora',
+      'degree': 'Médico General',
+      'location': 'Centro de Salud Kukra Hill, Kukra Hill, RAAS',
+      'rating': '4.4',
+      'review': '670 Reviews',
       'isFavorite': false,
     },
     {
       'image': LocalImages.icIntroImgFirst,
-      'name': 'Dr. David Patel',
-      'degree': 'Cardiologist',
-      'location': 'Cardiology Center, USA',
-      'rating': '5',
-      'review': '1,872 Reviews',
+      'name': 'Dr. Carlos Obando',
+      'degree': 'Cirujano General',
+      'location': 'Hospital Materno Infantil, Bluefields, RAAS',
+      'rating': '4.9',
+      'review': '1,200 Reviews',
+      'isFavorite': true,
+    },
+    {
+      'image': LocalImages.icFavoriteDoctor1Icon,
+      'name': 'Dra. María Gutiérrez',
+      'degree': 'Dermatóloga',
+      'location': 'Clínica San Carlos, Corn Island, RAAS',
+      'rating': '4.5',
+      'review': '760 Reviews',
       'isFavorite': false,
     },
+    {
+      'image': LocalImages.icFavoriteDoctor2Icon,
+      'name': 'Dr. Roberto Mena',
+      'degree': 'Odontólogo',
+      'location': 'Centro de Salud Prinzapolka, Prinzapolka, RAAN',
+      'rating': '4.3',
+      'review': '540 Reviews',
+      'isFavorite': false,
+    },
+    {
+      'image': LocalImages.icFavoriteDoctor3Icon,
+      'name': 'Dra. Juana Pérez',
+      'degree': 'Oftalmóloga',
+      'location': 'Clínica Médica Kukra River, Kukra River, RAAS',
+      'rating': '4.6',
+      'review': '620 Reviews',
+      'isFavorite': true,
+    }
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,10 +102,8 @@ class _MyDoctorViewState extends State<MyDoctorView> {
               );
             },
             child: Container(
-              width: 375,
-              height: 160,
-              margin: const EdgeInsets.all(16.0),
-              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
                 borderRadius: BorderRadius.circular(12.0),
@@ -109,35 +133,16 @@ class _MyDoctorViewState extends State<MyDoctorView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                doctor['name'],
-                                style: const TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  doctor['isFavorite']
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color: doctor['isFavorite']
-                                      ? Colors.red
-                                      : Colors.grey,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    doctor['isFavorite'] =
-                                        !doctor['isFavorite'];
-                                  });
-                                },
-                              ),
-                            ],
+                          Text(
+                            doctor['name'],
+                            style: const TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          const Divider(height: 1),
+                          SizedBox(height: 10),
+                          const Divider(height: 2),
+                          SizedBox(height: 10),
                           Text(
                             doctor['degree'],
                             style: TextStyle(
@@ -149,11 +154,13 @@ class _MyDoctorViewState extends State<MyDoctorView> {
                           Row(
                             children: [
                               const Icon(Icons.location_on_outlined),
-                              Text(
-                                doctor['location'],
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.grey[500],
+                              Expanded(
+                                child: Text(
+                                  doctor['location'],
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.grey[500],
+                                  ),
                                 ),
                               ),
                             ],

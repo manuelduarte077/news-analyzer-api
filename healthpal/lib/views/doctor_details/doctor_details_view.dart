@@ -1,16 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:readmore/readmore.dart';
+
 import 'package:healthpal/core/navigation/navigator.dart';
 import 'package:healthpal/utils/app_colors/app_colors.dart';
 import 'package:healthpal/utils/app_images/app_images.dart';
 import 'package:healthpal/views/book_appointment/my_book_appointment_widget_view.dart';
 import 'package:healthpal/views/doctor_details/widget/doctor_details_reviews_card_view.dart';
 import 'package:healthpal/widgets/app_button/app_button.dart';
-import 'package:readmore/readmore.dart';
 
 class DoctorDetailsView extends StatelessWidget {
   final Map<String, dynamic> doctor;
 
-  const DoctorDetailsView({super.key, required this.doctor});
+  const DoctorDetailsView({
+    super.key,
+    required this.doctor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +23,24 @@ class DoctorDetailsView extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
-          'Doctors Details',
+          'Detalles del doctor',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: AppColors.oxfordBlueColor,
           ),
         ),
-        actions: const [
-          Icon(
-            Icons.favorite_outline,
+        actions: [
+          IconButton(
+            icon: Icon(
+              doctor['isFavorite'] ? Icons.favorite : Icons.favorite_border,
+              color: doctor['isFavorite'] ? Colors.red : Colors.grey,
+            ),
+            onPressed: () {
+              doctor['isFavorite'] = !doctor['isFavorite'];
+            },
           ),
         ],
       ),
@@ -40,7 +52,7 @@ class DoctorDetailsView extends StatelessWidget {
             children: [
               Container(
                 width: double.infinity,
-                height: 133,
+                height: 140,
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor,
@@ -100,11 +112,13 @@ class DoctorDetailsView extends StatelessWidget {
                               child: Row(
                                 children: [
                                   const Icon(Icons.location_on_outlined),
-                                  Text(
-                                    doctor['location'],
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      color: Colors.grey[500],
+                                  Expanded(
+                                    child: Text(
+                                      doctor['location'],
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        color: Colors.grey[500],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -137,7 +151,7 @@ class DoctorDetailsView extends StatelessWidget {
                             LocalImages.icDoctorDetailsTbPersonIcon),
                       ),
                       const Text(
-                        '2,000+',
+                        '100+',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -145,7 +159,7 @@ class DoctorDetailsView extends StatelessWidget {
                         ),
                       ),
                       const Text(
-                        'patients',
+                        'pacientes',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
@@ -177,39 +191,7 @@ class DoctorDetailsView extends StatelessWidget {
                         ),
                       ),
                       const Text(
-                        'experience',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.paleSkyColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        margin: const EdgeInsets.only(right: 16),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(60),
-                          color: AppColors.athensGrayColor,
-                        ),
-                        child:
-                            Image.asset(LocalImages.icDoctorDetailsTbStarIcon),
-                      ),
-                      const Text(
-                        '5',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.riverBedColor,
-                        ),
-                      ),
-                      const Text(
-                        'rating',
+                        'experiencia',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
@@ -233,7 +215,7 @@ class DoctorDetailsView extends StatelessWidget {
                             LocalImages.icDoctorDetailsTbMessageReviewIcon),
                       ),
                       const Text(
-                        '1,872',
+                        '10',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -241,7 +223,8 @@ class DoctorDetailsView extends StatelessWidget {
                         ),
                       ),
                       const Text(
-                        'reviews',
+                        // 'reviews',
+                        'reseñas',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
@@ -257,7 +240,7 @@ class DoctorDetailsView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'About me',
+                    'Sobre mi',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -266,12 +249,12 @@ class DoctorDetailsView extends StatelessWidget {
                   ),
                   SizedBox(height: 5.0),
                   ReadMoreText(
-                    'Dr. David Patel, a dedicated cardiologist, brings a\nwealth of experience to Golden Gate Cardiology\nCenter in Golden Gate, CA.',
+                    'Dra. Juana Perez, un cardiólogo dedicado, aporta una\nriqueza de experiencia al Centro de Cardiología',
                     trimMode: TrimMode.Line,
                     trimLines: 1,
                     colorClickableText: Colors.blueAccent,
-                    trimCollapsedText: 'View more',
-                    trimExpandedText: 'View less',
+                    trimCollapsedText: 'Mostar más',
+                    trimExpandedText: ' Mostar menos',
                     moreStyle: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -285,7 +268,7 @@ class DoctorDetailsView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Working Time',
+                    'Tiempo de trabajo',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -294,7 +277,7 @@ class DoctorDetailsView extends StatelessWidget {
                   ),
                   SizedBox(height: 10.0),
                   Text(
-                    'Monday-Friday, 08.00 AM-18.00 pm',
+                    'Lunes a viernes, 08.00 AM - 18.00 pm',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.paleSkyColor,
@@ -302,14 +285,14 @@ class DoctorDetailsView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
+
+              /// Reviews
+              const SizedBox(height: 10),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Reviews',
+                    'Reseñas',
                     style: TextStyle(
                       fontSize: 20,
                       color: AppColors.ebonyClayColor,
@@ -317,7 +300,7 @@ class DoctorDetailsView extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'See All',
+                    'Ver todo',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.paleSkyColor,
@@ -327,11 +310,9 @@ class DoctorDetailsView extends StatelessWidget {
                 ],
               ),
               const DoctorDetailsReviewsCardView(),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               AppButtonView(
-                text: 'Book Appointment',
+                text: 'Reservar cita',
                 onTap: () {
                   Navigation.push(
                     context,

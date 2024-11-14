@@ -20,8 +20,9 @@ class _AllDoctorListViewState extends State<AllDoctorListView> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
-          'All Doctors',
+          'Todos los doctores',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -35,7 +36,7 @@ class _AllDoctorListViewState extends State<AllDoctorListView> {
           children: [
             TextFormFieldCustom(
               controller: addSearchController,
-              hintText: 'Search Doctor',
+              hintText: 'Buscar doctor',
               prefixIcon: const Padding(
                 padding: EdgeInsets.all(12.5),
                 child: Icon(
@@ -44,34 +45,13 @@ class _AllDoctorListViewState extends State<AllDoctorListView> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
+
+            /// DoctorCategoryListView is a custom widget that displays a list of doctor categories
+            const SizedBox(height: 20),
             DoctorCategoryListView(),
-            const SizedBox(
-              height: 20,
-            ),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '532 founds',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.blackColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Default ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.silverColor,
-                  ),
-                ),
-              ],
-            ),
+
+            /// MyDoctorView is a custom widget that displays a list of doctors
+            const SizedBox(height: 20),
             const Expanded(
               child: MyDoctorView(),
             ),

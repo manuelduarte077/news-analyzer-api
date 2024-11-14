@@ -14,9 +14,11 @@ class _MyNotificationsViewState extends State<MyNotificationsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: AppColors.whiteColor,
+        backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         title: const Text(
-          'Notifications',
+          'Notificaciones',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -27,13 +29,13 @@ class _MyNotificationsViewState extends State<MyNotificationsView> {
       body: ListView(
         children: [
           NotificationsListView(
-            dayName: 'TODAY',
-            title: 'Mark All As Read',
+            dayName: 'HOY',
+            title: 'Marcar Todo Como Leído',
             itemCount: 3,
           ),
           NotificationsListView(
-            dayName: 'YESTERDAY',
-            title: 'Mark All As Read',
+            dayName: 'AYER',
+            title: 'Marcar Todo Como Leído',
             itemCount: 1,
           ),
         ],

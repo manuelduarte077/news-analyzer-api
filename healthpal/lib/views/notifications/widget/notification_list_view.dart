@@ -13,27 +13,27 @@ class NotificationsListView extends StatelessWidget {
     {
       'image': LocalImages.icAppointmentSuccessIcon,
       'backgroundColor': AppColors.grannyAppleColor,
-      'appointmentStatus': 'Appointment Success',
+      'appointmentStatus': 'Cita Exitosa',
       'statusDescription':
-          'You have successfully booked your\nappointment with Dr. Emily Walker.',
+          'Has reservado exitosamente tu\ncita con la Dra. Emily Walker.',
       'time': '1h',
     },
     {
       'image': LocalImages.icAppointmentCancelledIcon,
       'backgroundColor': AppColors.cinderellaColor,
-      'appointmentStatus': 'Appointment Cancelled',
+      'appointmentStatus': 'Cita Cancelada',
       'statusDescription':
-          'You have successfully cancelled your\nappointment with Dr. David Patel.',
+          'Has cancelado exitosamente tu\ncita con el Dr. David Patel.',
       'time': '2h'
     },
     {
       'image': LocalImages.icAppointmentScheduledChangedIcon,
       'backgroundColor': AppColors.silverColor,
-      'appointmentStatus': 'Scheduled Changed',
+      'appointmentStatus': 'Cita Reprogramada',
       'statusDescription':
-          'You have successfully changes your\nappointment with Dr. Jesica Turner.',
+          'Has cambiado exitosamente tu\ncita con la Dra. Jesica Turner.',
       'time': '3h'
-    },
+    }
   ];
 
   @override

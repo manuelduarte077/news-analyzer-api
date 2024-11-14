@@ -24,9 +24,10 @@ class _MyBookAppointmentWidgetViewState
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         title: const Text(
-          'Book Appointment',
+          'Reservar cita',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -40,7 +41,7 @@ class _MyBookAppointmentWidgetViewState
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              'Select Date',
+              'Seleccionar fecha',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -62,7 +63,7 @@ class _MyBookAppointmentWidgetViewState
           const Padding(
             padding: EdgeInsets.all(10.0),
             child: Text(
-              'Select Hour',
+              'Seleccionar hora',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -80,7 +81,7 @@ class _MyBookAppointmentWidgetViewState
           Padding(
             padding: const EdgeInsets.all(10),
             child: AppButtonView(
-              text: 'Confirm',
+              text: 'Confirmar',
               onTap: () {
                 if (selectedDate != null && selectedTime != null) {
                   _dialogBuilder(context, selectedDate!, selectedTime!);
@@ -110,7 +111,7 @@ Future<void> _dialogBuilder(
               ),
             ),
             const Text(
-              'Congratulations!',
+              '¡Felicidades!',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -119,7 +120,7 @@ Future<void> _dialogBuilder(
             ),
             const SizedBox(height: 20),
             const Text(
-              'Your appointment with Dr. David Patel is confirmed for',
+              'Su cita con el Dra. Juana Pérez  está confirmada para',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -144,7 +145,7 @@ Future<void> _dialogBuilder(
             ),
             const SizedBox(height: 20),
             const Text(
-              'Edit Your Appointment',
+              'Editar su cita',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
