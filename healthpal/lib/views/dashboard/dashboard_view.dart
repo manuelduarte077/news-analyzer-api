@@ -21,15 +21,15 @@ class _DashboardViewState extends State<DashboardView> {
   final List<Map<String, dynamic>> medicalCenters = [
     {
       'image': LocalImages.icNearMedicalLogo,
-      'name': 'Sunrise Health Clinic',
+      'name': 'Co. San Miguel',
     },
     {
       'image': LocalImages.icNearMedicalLogo,
-      'name': 'Golden Cardiology Center',
+      'name': 'Centro de Cardiología Dorado',
     },
     {
       'image': LocalImages.icNearMedicalLogo,
-      'name': 'Sunrise Health Clinic',
+      'name': 'Clínica de Salud Integral',
     },
     // Add more centers here
   ];
@@ -47,35 +47,29 @@ class _DashboardViewState extends State<DashboardView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Text(
+                        'Ubicación',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.silverColor,
+                        ),
+                      ),
+                      Row(
                         children: [
-                          Text(
-                            'Location',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.silverColor,
-                            ),
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.black,
+                            size: 16,
                           ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.black,
-                                size: 16,
-                              ),
-                              Text(
-                                'Seattle, USA',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Icon(Icons.keyboard_arrow_down,
-                                  color: Colors.black),
-                            ],
+                          Text(
+                            'Bilwi, Puerto Cabezas',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -115,7 +109,7 @@ class _DashboardViewState extends State<DashboardView> {
               const SizedBox(height: 10),
               TextFormFieldCustom(
                 controller: addSearchController,
-                hintText: 'Search Doctor',
+                hintText: 'Buscar Doctor',
                 prefixIcon: const Padding(
                   padding: EdgeInsets.all(12.5),
                   child: Icon(
@@ -124,18 +118,16 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               const AppBannerView(),
-              const SizedBox(
-                height: 10,
-              ),
+
+              /// Categories
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Categories ',
+                    'Categorías',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -150,7 +142,7 @@ class _DashboardViewState extends State<DashboardView> {
                       );
                     },
                     child: const Text(
-                      'See All',
+                      'Ver Todo',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.silverColor,
@@ -160,59 +152,61 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 200,
-                child: GridView.count(
-                  crossAxisCount: 4,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 5.0,
-                  crossAxisSpacing: 5.0,
-                  childAspectRatio: 1,
-                  children: const [
-                    CategoriesWidgetView(
-                      image: LocalImages.icDentistryLogo,
-                      text: 'Dentistry',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icCardiologyLogo,
-                      text: 'Cardiology',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icPulmonoLogo,
-                      text: 'Pulmono',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icGeneralLogo,
-                      text: 'General',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icNeurologyLogo,
-                      text: 'Neurology',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icGastroenLogo,
-                      text: 'Gastroen',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icLaboratoLogo,
-                      text: 'Laborato',
-                    ),
-                    CategoriesWidgetView(
-                      image: LocalImages.icVaccinatLogo,
-                      text: 'Vaccinat',
-                    ),
-                  ],
-                ),
+
+              SizedBox(height: 10),
+
+              /// Categories Grid
+              GridView.count(
+                padding: EdgeInsets.zero,
+                crossAxisCount: 4,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 6.0,
+                crossAxisSpacing: 6.0,
+                childAspectRatio: 0.8,
+                children: const [
+                  CategoriesWidgetView(
+                    image: LocalImages.icDentistryLogo,
+                    text: 'Odontología',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icCardiologyLogo,
+                    text: 'Cardiología',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icPulmonoLogo,
+                    text: 'Pulmón',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icGeneralLogo,
+                    text: 'General',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icNeurologyLogo,
+                    text: 'Neurología',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icGastroenLogo,
+                    text: 'Gastrointestinal',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icLaboratoLogo,
+                    text: 'Laboratorio',
+                  ),
+                  CategoriesWidgetView(
+                    image: LocalImages.icVaccinatLogo,
+                    text: 'Vacuna',
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
+
+              /// Nearby Medical Centers
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Nearby Medical Centers',
+                    'Centros Médicos Cercanos',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -227,7 +221,7 @@ class _DashboardViewState extends State<DashboardView> {
                       );
                     },
                     child: Text(
-                      'See All',
+                      'Ver Todo',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.silverColor,

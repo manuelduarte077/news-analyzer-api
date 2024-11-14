@@ -19,7 +19,7 @@ class _ProfileViewState extends State<ProfileView> {
   TextEditingController dateController = TextEditingController();
   TextEditingController genderController = TextEditingController();
 
-  final List<String> genderItems = ['Male', 'Female', 'Other'];
+  final List<String> genderItems = ['Masculino', 'Femenino', 'Otro'];
 
   String? selectedValue;
   DateTime? selectedDate;
@@ -28,7 +28,9 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fill Your Profile'),
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const Text('Completa tu perfil'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -64,21 +66,21 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               TextFormFieldCustom(
                 controller: editNameController,
-                hintText: 'Michael Jordan',
+                hintText: 'Manuel Duarte',
               ),
               const SizedBox(
                 height: 8,
               ),
               TextFormFieldCustom(
                 controller: editNicknameController,
-                hintText: 'Nickname',
+                hintText: 'Apellidos',
               ),
               const SizedBox(
                 height: 8,
               ),
               TextFormFieldCustom(
                 controller: editEmailController,
-                hintText: 'name@example.com',
+                hintText: 'Correo Electrónico',
               ),
               const SizedBox(
                 height: 8,
@@ -90,7 +92,7 @@ class _ProfileViewState extends State<ProfileView> {
                 child: AbsorbPointer(
                   child: TextFormFieldCustom(
                     controller: dateController,
-                    hintText: 'Date of Birth',
+                    hintText: 'Fecha de Nacimiento',
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12.5),
                       child: Image.asset(
@@ -123,7 +125,7 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                     value: selectedValue,
                     hint: const Text(
-                      'Gender',
+                      'Género',
                       style: TextStyle(
                         color: AppColors.silverColor,
                         fontWeight: FontWeight.w400,
@@ -158,7 +160,7 @@ class _ProfileViewState extends State<ProfileView> {
                 onTap: () {
                   _dialogBuilder(context);
                 },
-                text: 'Save',
+                text: 'Guardar Cambios',
               ),
             ],
           ),
@@ -199,7 +201,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Congratulations!',
+                '¡Felicidades!',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -208,7 +210,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Your account is ready to use. You will be redirected to the Home Page in a few seconds...',
+                'Tu cuenta está lista para usar. Serás redirigido a la página de inicio en unos segundos...',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -225,11 +227,12 @@ class _ProfileViewState extends State<ProfileView> {
                 height: 50,
                 width: 50,
                 child: LoadingIndicator(
-                    indicatorType: Indicator.ballRotateChase,
-                    colors: [Colors.black, Colors.white],
-                    strokeWidth: 2,
-                    backgroundColor: Colors.transparent,
-                    pathBackgroundColor: Colors.black),
+                  indicatorType: Indicator.ballRotateChase,
+                  colors: [Colors.black, Colors.white],
+                  strokeWidth: 2,
+                  backgroundColor: Colors.transparent,
+                  pathBackgroundColor: Colors.black,
+                ),
               ),
             )
           ],
