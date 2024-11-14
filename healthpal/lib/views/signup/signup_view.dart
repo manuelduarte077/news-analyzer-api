@@ -40,14 +40,14 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             RichText(
               text: const TextSpan(
-                text: 'Health',
+                text: 'Daktar',
                 style: TextStyle(
                   fontSize: 22,
                   color: AppColors.silverColor,
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Pal',
+                    text: 'Lamara',
                     style: TextStyle(
                       fontSize: 22,
                       color: AppColors.blackColor,
@@ -59,7 +59,7 @@ class _SignUpViewState extends State<SignUpView> {
             const Padding(
               padding: EdgeInsets.only(top: 18.0, bottom: 2),
               child: Text(
-                'Create Account',
+                'Crear Cuenta',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class _SignUpViewState extends State<SignUpView> {
               ),
             ),
             const Text(
-              'We are here to help you!',
+              'Estamos aquí para ayudarte!',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF6B7280),
@@ -79,7 +79,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             TextFormFieldCustom(
               controller: addNameController,
-              hintText: 'Your Name',
+              hintText: 'Nombre',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -94,7 +94,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             TextFormFieldCustom(
               controller: addEmailController,
-              hintText: 'Your Email',
+              hintText: 'Correo Electrónico',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -109,7 +109,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             TextFormFieldCustom(
               controller: addPasswordController,
-              hintText: 'Password',
+              hintText: 'Contraseña',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -125,7 +125,7 @@ class _SignUpViewState extends State<SignUpView> {
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: AppButtonView(
-                text: 'Create Account',
+                text: 'Crear Cuenta',
                 onTap: () {
                   Navigation.push(
                     context,
@@ -137,38 +137,17 @@ class _SignUpViewState extends State<SignUpView> {
             const SizedBox(
               height: 20,
             ),
-            const OrDivider(
-              text: 'Or',
-            ),
+            const OrDivider(text: 'O'),
             const SizedBox(
               height: 20,
             ),
             AppButtonView(
               iconTextWidth: 10,
               isSizeBox: true,
-              imgHeight: 30,
+              imgHeight: 25,
               isImage: true,
               image: LocalImages.icGoogleLogo,
-              text: 'Continue with Google',
-              color: Colors.white,
-              textColor: Colors.black,
-              onTap: () {},
-              border: Border.all(
-                color: Colors.black.withOpacity(0.2),
-                width: 0.5,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            AppButtonView(
-              iconTextWidth: 10,
-              isSizeBox: true,
-              imgHeight: 30,
-              isImage: true,
-              image: LocalImages.icFaceBookLogo,
-              text: 'Continue with FaceBook',
+              text: 'Continuar con Google',
               color: Colors.white,
               textColor: Colors.black,
               onTap: () {},
@@ -183,14 +162,14 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             RichText(
               text: TextSpan(
-                text: 'Do you have an account ? ',
+                text: '¿Ya tienes una cuenta? ',
                 style: const TextStyle(
                   color: AppColors.silverColor,
                   fontSize: 14,
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Sign In',
+                    text: 'Iniciar Sesión',
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         Navigation.pushReplacement(
@@ -199,9 +178,10 @@ class _SignUpViewState extends State<SignUpView> {
                         );
                       },
                     style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600),
+                      fontSize: 14,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),

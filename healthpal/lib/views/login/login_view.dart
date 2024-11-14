@@ -41,19 +41,17 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             RichText(
               text: const TextSpan(
-                text: 'Health',
+                text: 'Daktar',
                 style: TextStyle(
                   fontSize: 22,
                   color: AppColors.silverColor,
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Pal',
+                    text: 'Lamara',
                     style: TextStyle(
                       fontSize: 22,
                       color: AppColors.blackColor,
@@ -68,7 +66,7 @@ class _SignInViewState extends State<SignInView> {
             const Padding(
               padding: EdgeInsets.only(top: 18.0, bottom: 2),
               child: Text(
-                'Hi, Welcome Back! ',
+                'Hola, Bienvenido!',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -80,7 +78,7 @@ class _SignInViewState extends State<SignInView> {
               height: 8,
             ),
             const Text(
-              'Hope you’re doing fine.',
+              'Espero que estés bien.',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF6B7280),
@@ -91,7 +89,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             TextFormFieldCustom(
               controller: addEmailController,
-              hintText: 'Your Email',
+              hintText: 'Correo Electrónico',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -105,7 +103,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             TextFormFieldCustom(
               controller: addPasswordController,
-              hintText: 'Password',
+              hintText: 'Contraseña',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -120,7 +118,7 @@ class _SignInViewState extends State<SignInView> {
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: AppButtonView(
-                text: 'Sign In',
+                text: 'Iniciar sesión',
                 onTap: () {
                   Navigation.removeAllPreviousAndPush(
                       context, const BottomNavigationBarView());
@@ -139,10 +137,10 @@ class _SignInViewState extends State<SignInView> {
             AppButtonView(
               iconTextWidth: 10,
               isSizeBox: true,
-              imgHeight: 30,
+              imgHeight: 25,
               isImage: true,
               image: LocalImages.icGoogleLogo,
-              text: 'Sign In with Google',
+              text: 'Iniciar sesión con Google',
               color: Colors.white,
               textColor: Colors.black,
               onTap: () {},
@@ -152,28 +150,7 @@ class _SignInViewState extends State<SignInView> {
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(
-              height: 16,
-            ),
-            AppButtonView(
-              iconTextWidth: 10,
-              isSizeBox: true,
-              imgHeight: 30,
-              isImage: true,
-              image: LocalImages.icFaceBookLogo,
-              text: 'Sign In with FaceBook',
-              color: Colors.white,
-              textColor: Colors.black,
-              onTap: () {},
-              border: Border.all(
-                color: Colors.black.withOpacity(0.2),
-                width: 0.5,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            const SizedBox(
-              height: 23,
-            ),
+            const SizedBox(height: 23),
             GestureDetector(
               onTap: () {
                 Navigation.pushReplacement(
@@ -182,11 +159,12 @@ class _SignInViewState extends State<SignInView> {
                 );
               },
               child: const Text(
-                'Forgot password?',
+                '¿Olvidaste tu contraseña?',
                 style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600),
+                  fontSize: 14,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(
@@ -194,14 +172,14 @@ class _SignInViewState extends State<SignInView> {
             ),
             RichText(
               text: TextSpan(
-                text: 'Don’t have an account yet ? ',
+                text: '¿No tienes una cuenta todavía? ',
                 style: const TextStyle(
                   color: AppColors.silverColor,
                   fontSize: 14,
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Sign Up',
+                    text: 'Regístrate',
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         Navigation.pushReplacement(
@@ -210,9 +188,10 @@ class _SignInViewState extends State<SignInView> {
                         );
                       },
                     style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600),
+                      fontSize: 14,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),

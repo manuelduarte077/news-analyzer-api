@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:healthpal/core/navigation/navigator.dart';
 import 'package:healthpal/utils/app_colors/app_colors.dart';
 import 'package:healthpal/utils/app_images/app_images.dart';
-import 'package:healthpal/utils/app_strings/app_strings.dart';
 import 'package:healthpal/views/intro/intro_view.dart';
 
 class SplashView extends StatefulWidget {
