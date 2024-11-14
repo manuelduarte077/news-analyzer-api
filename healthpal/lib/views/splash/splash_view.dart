@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:healthpal/core/navigation/navigator.dart';
 import 'package:healthpal/utils/app_colors/app_colors.dart';
 import 'package:healthpal/utils/app_images/app_images.dart';
+import 'package:healthpal/utils/app_strings/app_strings.dart';
 import 'package:healthpal/views/intro/intro_view.dart';
 
 class SplashView extends StatefulWidget {
@@ -87,15 +88,15 @@ class _SplashViewState extends State<SplashView> {
                         height: 150,
                       ),
                       RichText(
-                        text: const TextSpan(
-                          text: 'Health',
+                        text: TextSpan(
+                          text: 'Daktar',
                           style: TextStyle(
                             fontSize: 18,
                             color: AppColors.silverColor,
                           ),
                           children: <TextSpan>[
                             TextSpan(
-                              text: 'Pal',
+                              text: 'Lamara',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: AppColors.whiteColor,

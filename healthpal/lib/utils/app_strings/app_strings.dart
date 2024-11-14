@@ -1,15 +1,15 @@
 class AppStrings {
-  static const String appName = 'HealthPal';
-  static const String firstTitle = 'Meet Doctors Online';
-  static const String secondTitle = 'Connect with Specialists';
-  static const String thirdTitle = 'Thousands of Online Specialists';
+  static const String appName = 'DaktarLamara';
+  static const String firstTitle = 'Consulta Médica en Línea';
+  static const String secondTitle = 'Conéctate con Especialistas';
+  static const String thirdTitle = 'Miles de Especialistas en Línea';
   static const String firstDescription =
-      'Connect with Specialized Doctors Online for Convenient and Comprehensive Medical Consultations.';
+      'Conéctate con médicos especializados en línea para consultas médicas convenientes y completas.';
   static const String secondDescription =
-      'Connect with Specialized Doctors Online for Convenient and Comprehensive Medical Consultations.';
+      'Conéctate con médicos especializados en línea para consultas médicas convenientes y completas.';
   static const String thirdDescription =
-      ' Explore a Vast Array of Online Medical Specialists, Offering an Extensive Range of Expertise Tailored to Your Healthcare Needs.';
-  static const String bannerTitle = ' Looking for\n Specialist Doctors?';
+      'Explora una amplia gama de especialistas médicos en línea, ofreciendo una extensa variedad de conocimientos adaptados a tus necesidades de salud.';
+  static const String bannerTitle = '¿Buscas\n Especialistas Médicos?';
   static const String bannerDescription =
-      ' Schedule an appointment with\n our top doctors.';
+      'Programa una cita con\n nuestros mejores médicos.';
 }

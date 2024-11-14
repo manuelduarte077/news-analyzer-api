@@ -99,7 +99,7 @@ class _IntroViewState extends State<IntroView> {
             padding: const EdgeInsets.symmetric(horizontal: 30) +
                 const EdgeInsets.only(bottom: 14),
             child: AppButtonView(
-              text: 'Next',
+              text: 'Siguiente',
               onTap: _onNextPressed,
             ),
           ),
@@ -128,7 +128,7 @@ class _IntroViewState extends State<IntroView> {
                 );
               },
               child: const Text(
-                'Skip',
+                'Omitir',
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF6B7280),
