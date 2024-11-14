@@ -1,8 +1,8 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import '../models/medico.dart';
 
 class MedicoProvider with ChangeNotifier {
@@ -27,6 +27,7 @@ class MedicoProvider with ChangeNotifier {
     }
   }
 
+  // Llamada a la Firebase Function para crear el médico
   Future<void> addMedico(Medico medico, String password) async {
     try {
       final user = _auth.currentUser;
@@ -35,19 +36,25 @@ class MedicoProvider with ChangeNotifier {
       }
       log('Sesión activa de administrador: ${user.email}');
 
-      final medicoRef = _firestore.collection('medicos').doc();
-      final medicoId = medicoRef.id;
+      // Llama a la Firebase Function para crear el usuario del médico
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('createMedicoUser');
 
-      await medicoRef.set({
-        'uid': medicoId,
-        ...medico.toMap(),
+      final response = await callable.call(<String, dynamic>{
+        'email': medico.usuario,
         'password': password,
+        'nombre': medico.nombre,
+        'apellido': medico.apellido,
+        'especialidad': medico.especialidad,
+        'area': medico.area,
       });
 
+      final resultData = response.data;
+      log('Médico creado con UID: ${resultData['uid']}');
+
+      // Agregar el médico a la lista local para que la UI se actualice
       _medicos.add(medico);
       notifyListeners();
-
-      log('Médico agregado sin cambiar la sesión del administrador.');
     } catch (e) {
       _handleError(e);
     }
