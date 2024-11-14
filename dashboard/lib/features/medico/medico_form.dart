@@ -1,9 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'providers/medico_provider.dart';
 import 'models/medico.dart';
@@ -86,7 +81,7 @@ class _MedicoFormScreenState extends State<MedicoFormScreen> {
                         style: TextButton.styleFrom(
                           minimumSize: const Size(120, 50),
                         ),
-                        onPressed: () => context.pop(),
+                        onPressed: () => Navigator.pop(context),
                         child: const Text('Cancelar'),
                       ),
                       FilledButton(
@@ -102,14 +97,25 @@ class _MedicoFormScreenState extends State<MedicoFormScreen> {
                               area: areaController.text,
                               usuario: usuarioController.text,
                             );
-                            try {
-                              await Provider.of<MedicoProvider>(context,
-                                      listen: false)
-                                  .addMedico(medico, passwordController.text);
 
-                              Navigator.of(context).pop();
+                            final medicoProvider = Provider.of<MedicoProvider>(
+                                context,
+                                listen: false);
+
+                            try {
+                              await medicoProvider.addMedico(
+                                  medico, passwordController.text);
+                              if (mounted) {
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                              }
                             } catch (e) {
-                              log('Error al agregar el médico: $e');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
                             }
                           }
                         },
@@ -135,7 +141,9 @@ class _MedicoFormScreenState extends State<MedicoFormScreen> {
         controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
-            labelText: labelText, border: const OutlineInputBorder()),
+          labelText: labelText,
+          border: const OutlineInputBorder(),
+        ),
         validator: (value) =>
             value == null || value.isEmpty ? validatorText : null,
       ),

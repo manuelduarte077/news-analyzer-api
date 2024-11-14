@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,47 +29,44 @@ class MedicoProvider with ChangeNotifier {
 
   Future<void> addMedico(Medico medico, String password) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: medico.usuario,
-        password: password,
-      );
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No hay ningún administrador autenticado.');
+      }
+      log('Sesión activa de administrador: ${user.email}');
 
-      await _firestore
-          .collection('medicos')
-          .doc(userCredential.user?.uid)
-          .set(medico.toMap());
+      final medicoRef = _firestore.collection('medicos').doc();
+      final medicoId = medicoRef.id;
+
+      await medicoRef.set({
+        'uid': medicoId,
+        ...medico.toMap(),
+        'password': password,
+      });
 
       _medicos.add(medico);
       notifyListeners();
+
+      log('Médico agregado sin cambiar la sesión del administrador.');
     } catch (e) {
       _handleError(e);
     }
   }
 
-  Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-    } catch (e) {
-      throw Exception('Error signing out: $e');
-    }
-  }
-
-  // Handle errors more precisely and log them
   void _handleError(dynamic error) {
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'email-already-in-use':
-          throw Exception('This email is already in use.');
+          throw Exception('Este correo ya está en uso.');
         case 'invalid-email':
-          throw Exception('The email address is not valid.');
+          throw Exception('La dirección de correo electrónico no es válida.');
         case 'weak-password':
-          throw Exception('The password is too weak.');
+          throw Exception('La contraseña es muy débil.');
         default:
-          throw Exception('Authentication error: ${error.message}');
+          throw Exception('Error de autenticación: ${error.message}');
       }
     } else {
-      throw Exception('An unexpected error occurred: $error');
+      throw Exception('Ocurrió un error inesperado: $error');
     }
   }
 }
