@@ -14,42 +14,26 @@ class CanceledWidgetView extends StatefulWidget {
 class _CanceledWidgetViewState extends State<CanceledWidgetView> {
   final List<Map<String, dynamic>> cancelBooking = [
     {
-      'date': 'June 15, 2024',
+      'date': '15 de junio de 2024',
       'doctorName': 'Dr. John Doe',
-      'specialty': 'Cardiologist',
-      'clinic': 'Heart Care Clinic',
+      'specialty': 'Cardiólogo',
+      'clinic': 'Clínica de Cuidado del Corazón',
       'image': LocalImages.icFavoriteDoctor1Icon,
       'icon': Icons.location_on,
     },
     {
-      'date': 'June 20, 2024',
-      'doctorName': 'Dr. Jane Smith',
-      'specialty': 'Dermatologist',
-      'clinic': 'Skin Health Clinic',
+      'date': '20 de junio de 2024',
+      'doctorName': 'Dra. Jane Smith',
+      'specialty': 'Dermatóloga',
+      'clinic': 'Clínica de Salud de la Piel',
       'image': LocalImages.icFavoriteDoctor2Icon,
       'icon': Icons.location_on,
     },
     {
-      'date': 'June 15, 2024',
+      'date': '15 de junio de 2024',
       'doctorName': 'Dr. John Doe',
-      'specialty': 'Cardiologist',
-      'clinic': 'Heart Care Clinic',
-      'image': LocalImages.icFavoriteDoctor3Icon,
-      'icon': Icons.location_on,
-    },
-    {
-      'date': 'June 20, 2024',
-      'doctorName': 'Dr. Jane Smith',
-      'specialty': 'Dermatologist',
-      'clinic': 'Skin Health Clinic',
-      'image': LocalImages.icFavoriteDoctor4Icon,
-      'icon': Icons.location_on,
-    },
-    {
-      'date': 'June 15, 2024',
-      'doctorName': 'Dr. John Doe',
-      'specialty': 'Cardiologist',
-      'clinic': 'Heart Care Clinic',
+      'specialty': 'Cardiólogo',
+      'clinic': 'Clínica de Cuidado del Corazón',
       'image': LocalImages.icIntroImgFirst,
       'icon': Icons.location_on,
     },
@@ -62,6 +46,7 @@ class _CanceledWidgetViewState extends State<CanceledWidgetView> {
         itemCount: cancelBooking.length,
         itemBuilder: (context, index) {
           final booking = cancelBooking[index];
+
           return Column(
             children: [
               AppAppointmentCardView(
@@ -80,14 +65,14 @@ class _CanceledWidgetViewState extends State<CanceledWidgetView> {
                           color: AppColors.whiteColor,
                           textColor: AppColors.blackColor,
                           border: Border.all(color: AppColors.mirageColor),
-                          text: 'Cancel',
+                          text: 'Cancelar',
                           onTap: () {},
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: AppButtonView(
-                          text: 'Reschedule',
+                          text: 'Reprogramar',
                           onTap: () {},
                         ),
                       ),

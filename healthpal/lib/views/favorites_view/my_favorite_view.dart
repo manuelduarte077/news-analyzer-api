@@ -30,6 +30,8 @@ class _MyFavoriteViewState extends State<MyFavoriteView>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: const Text(
           'Favorites',
@@ -52,7 +54,7 @@ class _MyFavoriteViewState extends State<MyFavoriteView>
             tabs: const [
               Tab(
                 child: Text(
-                  'Doctors',
+                  'Doctores',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -61,7 +63,7 @@ class _MyFavoriteViewState extends State<MyFavoriteView>
               ),
               Tab(
                 child: Text(
-                  'Hospitals',
+                  'Hospitales',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -75,7 +77,12 @@ class _MyFavoriteViewState extends State<MyFavoriteView>
               controller: _tabController,
               children: const [
                 MyFavoriteDoctorRemoveView(),
-                MyHospitalView(),
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: MyHospitalView(),
+                  ),
+                ),
               ],
             ),
           ),

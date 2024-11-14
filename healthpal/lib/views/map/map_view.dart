@@ -36,7 +36,7 @@ class _MapViewState extends State<MapView> {
             child: TextFormFieldCustom(
               fillColor: AppColors.whiteColor,
               controller: addSearchController,
-              hintText: 'Search Doctor',
+              hintText: 'Buscar Hospital',
               prefixIcon: const Padding(
                 padding: EdgeInsets.all(12.5),
                 child: Icon(

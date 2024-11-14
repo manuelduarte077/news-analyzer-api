@@ -100,11 +100,13 @@ class AppAppointmentCardView extends StatelessWidget {
                     Row(
                       children: [
                         Icon(icon),
-                        Text(
-                          clinic ?? '',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.grey[600],
+                        Expanded(
+                          child: Text(
+                            clinic ?? '',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ),
                       ],
