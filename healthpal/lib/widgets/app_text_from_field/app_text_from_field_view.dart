@@ -76,11 +76,18 @@ class TextFormFieldCustom extends StatelessWidget {
               if (callBackOnChange != null) callBackOnChange!(value);
             },
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w500, fontSize: 14),
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
             decoration: InputDecoration(
               counterText: '',
               contentPadding: const EdgeInsets.only(
-                  left: 24, right: 18, top: 16, bottom: 0),
+                left: 24,
+                right: 18,
+                top: 16,
+                bottom: 0,
+              ),
               hintText: hintText ?? 'HintText',
               filled: true,
               fillColor: fillColor ?? Colors.transparent,
