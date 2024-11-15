@@ -1,0 +1,43 @@
+---
+import Navbar from "../../components/Navbar.astro";
+import Layout from "../../layouts/Layout.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<Layout title="Support">
+  <Navbar />
+
+  <section class="bg-white py-12 sm:py-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <h1 class="text-2xl sm:text-3xl font-semibold text-text mb-6 text-center sm:text-left">
+        Support
+      </h1>
+      <p class="text-gray-600 leading-relaxed mb-6 text-center sm:text-left">
+        We're here to help! If you have any questions or need assistance, please
+        reach out to our support team.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-semibold text-text mb-4">
+        Contact Us
+      </h2>
+      <p class="text-gray-600 leading-relaxed mb-6">
+        You can contact us via email at 
+        <a href="mailto:support@notedup.com" class="underline text-blue-600">
+          support@notedup.com
+        </a>. We'll do our best to respond within 24 hours.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-semibold text-text mb-4">
+        Frequently Asked Questions
+      </h2>
+      <p class="text-gray-600 leading-relaxed">
+        Check out our 
+        <a href="/faq" class="underline text-blue-600">
+          FAQ page
+        </a> for answers to common questions about using NotedUp.
+      </p>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
