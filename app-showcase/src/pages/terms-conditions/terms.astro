@@ -1,0 +1,37 @@
+---
+import Navbar from "../../components/Navbar.astro";
+import Layout from "../../layouts/Layout.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<Layout title="Terms and Conditions">
+  <Navbar />
+
+  <section class="bg-white py-12 sm:py-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <h1 class="text-2xl sm:text-3xl font-semibold text-text mb-6 text-center sm:text-left">
+        Terms and Conditions
+      </h1>
+      <p class="text-gray-600 leading-relaxed mb-6 text-center sm:text-left">
+        Welcome to NotedUp. These terms and conditions outline the rules and regulations for the use of our website.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-semibold text-text mb-4">
+        License
+      </h2>
+      <p class="text-gray-600 leading-relaxed mb-6">
+        Unless otherwise stated, NotedUp and/or its licensors own the intellectual property rights for all material on NotedUp.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-semibold text-text mb-4">
+        User Conduct
+      </h2>
+      <p class="text-gray-600 leading-relaxed mb-6">
+        Users must refrain from using the site for any illegal or unauthorized purpose. You agree to not engage in activities that violate any applicable laws.
+      </p>
+
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
