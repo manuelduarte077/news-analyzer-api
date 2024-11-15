@@ -91,14 +91,14 @@ class _VerifyCodeViewState extends State<VerifyCodeView> {
             ),
             RichText(
               text: const TextSpan(
-                text: 'Health',
+                text: 'Daktar',
                 style: TextStyle(
                   fontSize: 22,
                   color: AppColors.silverColor,
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Pal',
+                    text: 'Lamara',
                     style: TextStyle(
                       fontSize: 22,
                       color: AppColors.blackColor,
@@ -113,7 +113,7 @@ class _VerifyCodeViewState extends State<VerifyCodeView> {
             const Padding(
               padding: EdgeInsets.only(top: 18.0, bottom: 2),
               child: Text(
-                'Verify Code',
+                'Verificar Código',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _VerifyCodeViewState extends State<VerifyCodeView> {
               height: 10,
             ),
             const Text(
-              'Enter the the code \n we just sent you on your registered Email',
+              'Ingrese el código \n que le acabamos de enviar a su correo electrónico registrado',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF6B7280),
@@ -142,7 +142,7 @@ class _VerifyCodeViewState extends State<VerifyCodeView> {
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: AppButtonView(
-                text: 'Verify',
+                text: 'Verificar',
                 onTap: () {
                   Navigation.pushReplacement(
                     context,
@@ -154,7 +154,7 @@ class _VerifyCodeViewState extends State<VerifyCodeView> {
             const SizedBox(height: 20),
             RichText(
               text: TextSpan(
-                text: 'Didn’t get the Code?',
+                text: '¿No recibiste el código?',
                 style: const TextStyle(color: AppColors.silverColor),
                 children: <TextSpan>[
                   TextSpan(

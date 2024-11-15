@@ -40,14 +40,14 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             ),
             RichText(
               text: const TextSpan(
-                text: 'Health',
+                text: 'Daktar',
                 style: TextStyle(
                   fontSize: 22,
                   color: AppColors.silverColor,
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Pal',
+                    text: 'Lamara',
                     style: TextStyle(
                       fontSize: 22,
                       color: AppColors.blackColor,
@@ -56,13 +56,11 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             const Padding(
               padding: EdgeInsets.only(top: 18.0, bottom: 2),
               child: Text(
-                'Forget Password?',
+                'Recuperar Contraseña?',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -74,7 +72,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
               height: 10,
             ),
             const Text(
-              'Enter your Email, we will send you a verification\ncode.',
+              textAlign: TextAlign.center,
+              'Ingrese su correo electrónico, le enviaremos un código de verificación.',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF6B7280),
@@ -85,7 +84,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             ),
             TextFormFieldCustom(
               controller: addEmailController,
-              hintText: 'Your Email',
+              hintText: 'Tu Correo Electrónico',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -100,7 +99,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: AppButtonView(
-                text: 'Send Code',
+                text: 'Enviar Código',
                 onTap: () {
                   Navigation.push(
                     context,

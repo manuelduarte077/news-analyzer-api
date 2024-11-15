@@ -44,14 +44,14 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
             ),
             RichText(
               text: const TextSpan(
-                text: 'Health',
+                text: 'Daktar',
                 style: TextStyle(
                   fontSize: 22,
                   color: AppColors.silverColor,
                 ),
-                children: <TextSpan>[
+                children: [
                   TextSpan(
-                    text: 'Pal',
+                    text: 'Lamara',
                     style: TextStyle(
                       fontSize: 22,
                       color: AppColors.blackColor,
@@ -66,7 +66,8 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
             const Padding(
               padding: EdgeInsets.only(top: 18.0, bottom: 2),
               child: Text(
-                'Create new password',
+                // 'Create new password',
+                'Crear nueva contraseña',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -78,7 +79,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
               height: 10,
             ),
             const Text(
-              'Your new password must be different form \n previously used password',
+              'Tu nueva contraseña debe ser diferente de la \n contraseña utilizada anteriormente',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF6B7280),
@@ -89,7 +90,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
             ),
             TextFormFieldCustom(
               controller: addPasswordController,
-              hintText: 'Password',
+              hintText: 'Contraseña',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -103,7 +104,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
             ),
             TextFormFieldCustom(
               controller: confirmPasswordController,
-              hintText: 'Confirm Password',
+              hintText: 'Confirmar contraseña',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.5),
                 child: Image.asset(
@@ -118,7 +119,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: AppButtonView(
-                text: 'Resend Password',
+                text: 'Reenviar contraseña',
                 onTap: () {
                   Navigation.removeAllPreviousAndPush(
                     context,
