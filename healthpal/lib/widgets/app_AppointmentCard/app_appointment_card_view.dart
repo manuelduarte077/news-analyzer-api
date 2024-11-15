@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthpal/utils/app_colors/app_colors.dart';
-import 'package:healthpal/utils/app_images/app_images.dart';
+import 'package:healthpal/core/utils/app_colors/app_colors.dart';
+import 'package:healthpal/core/utils/app_images/app_images.dart';
 
 class AppAppointmentCardView extends StatelessWidget {
   final String? date;
@@ -100,11 +100,13 @@ class AppAppointmentCardView extends StatelessWidget {
                     Row(
                       children: [
                         Icon(icon),
-                        Text(
-                          clinic ?? '',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.grey[600],
+                        Expanded(
+                          child: Text(
+                            clinic ?? '',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ),
                       ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthpal/utils/app_colors/app_colors.dart';
+import 'package:healthpal/core/utils/app_colors/app_colors.dart';
 
 class TextFormFieldCustom extends StatelessWidget {
   final TextEditingController? controller;
@@ -76,18 +76,26 @@ class TextFormFieldCustom extends StatelessWidget {
               if (callBackOnChange != null) callBackOnChange!(value);
             },
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w500, fontSize: 14),
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
             decoration: InputDecoration(
               counterText: '',
               contentPadding: const EdgeInsets.only(
-                  left: 24, right: 18, top: 16, bottom: 0),
+                left: 24,
+                right: 18,
+                top: 16,
+                bottom: 0,
+              ),
               hintText: hintText ?? 'HintText',
               filled: true,
               fillColor: fillColor ?? Colors.transparent,
               hintStyle: const TextStyle(
-                  color: AppColors.silverColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18),
+                color: AppColors.silverColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+              ),
               disabledBorder: OutlineInputBorder(
                 borderRadius:
                     disabledBorderRadius ?? BorderRadius.circular(12.0),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthpal/utils/app_colors/app_colors.dart';
+import 'package:healthpal/core/utils/app_colors/app_colors.dart';
 
 class AppButtonView extends StatelessWidget {
   final double? height;
@@ -60,7 +60,7 @@ class AppButtonView extends StatelessWidget {
             Text(
               text ?? '',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 color: textColor ?? AppColors.whiteColor,
               ),
             ),
