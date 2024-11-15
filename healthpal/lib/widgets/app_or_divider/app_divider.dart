@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthpal/utils/app_colors/app_colors.dart';
+import 'package:healthpal/core/utils/app_colors/app_colors.dart';
 
 class OrDivider extends StatelessWidget {
   final String? text;

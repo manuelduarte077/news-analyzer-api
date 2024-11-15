@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthpal/firebase_options.dart';
-import 'package:healthpal/utils/app_strings/app_strings.dart';
-import 'package:healthpal/views/splash/splash_view.dart';
+import 'package:healthpal/core/utils/app_strings/app_strings.dart';
+import 'package:healthpal/features/splash/splash_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

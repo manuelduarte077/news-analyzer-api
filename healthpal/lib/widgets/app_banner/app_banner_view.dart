@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthpal/utils/app_colors/app_colors.dart';
-import 'package:healthpal/utils/app_images/app_images.dart';
-import 'package:healthpal/utils/app_strings/app_strings.dart';
+import 'package:healthpal/core/utils/app_colors/app_colors.dart';
+import 'package:healthpal/core/utils/app_images/app_images.dart';
+import 'package:healthpal/core/utils/app_strings/app_strings.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:async';
 
