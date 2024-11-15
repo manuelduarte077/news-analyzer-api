@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:healthpal/utils/app_colors/app_colors.dart';
 import 'package:healthpal/views/map/hospital_details_widget/hospital_details_view.dart';
 import 'package:healthpal/widgets/app_text_from_field/app_text_from_field_view.dart';
@@ -13,22 +13,45 @@ class MapView extends StatefulWidget {
 
 class _MapViewState extends State<MapView> {
   TextEditingController addSearchController = TextEditingController();
-  // GoogleMapController? mapController;
+
+  GoogleMapController? mapController;
+
+  void _moveCameraToLocation(double latitude, double longitude) {
+    if (mapController != null) {
+      mapController!.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(latitude, longitude),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // GoogleMap(
-          //   onMapCreated: (controller) {
-          //     mapController = controller;
-          //   },
-          //   initialCameraPosition: CameraPosition(
-          //     target: LatLng(-33.8688, 151.2093),
-          //     zoom: 10,
-          //   ),
-          // ),
+          GoogleMap(
+            onMapCreated: (controller) {
+              mapController = controller;
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(12.0006, -83.7645),
+              zoom: 10,
+            ),
+            myLocationEnabled: true,
+            markers: {
+              for (var center in HospitalDetailsView.medicalCenters)
+                Marker(
+                  markerId: MarkerId(center['name']),
+                  position: LatLng(center['latitude'], center['longitude']),
+                  infoWindow: InfoWindow(
+                    title: center['name'],
+                    snippet: center['address'],
+                  ),
+                ),
+            },
+          ),
           Positioned(
             top: 50,
             left: 20,
@@ -62,7 +85,11 @@ class _MapViewState extends State<MapView> {
                   ),
                 ],
               ),
-              child: const HospitalDetailsView(),
+              child: HospitalDetailsView(
+                onCardTap: (latitude, longitude) {
+                  _moveCameraToLocation(latitude, longitude);
+                },
+              ),
             ),
           ),
         ],
