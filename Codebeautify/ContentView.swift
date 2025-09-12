@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Foundation
-import CryptoKit
 
 
 enum ViewMode: String, CaseIterable {
@@ -55,7 +54,6 @@ struct ContentView: View {
 struct ToolDetailView: View {
     let selectedTool: ToolType
     @AppStorage("viewMode") private var viewMode: ViewMode = .text
-    @AppStorage("processMode_base64") private var base64ProcessMode: ProcessMode = .encode
     @State private var inputText: String = ""
     @State private var outputText: String = ""
     @State private var showError: Bool = false
@@ -83,17 +81,6 @@ struct ToolDetailView: View {
                         }
                         .pickerStyle(.segmented)
                         .frame(width: 200)
-                    } else if selectedTool == .base64 {
-                        Picker("Process Mode", selection: $base64ProcessMode) {
-                            ForEach(ProcessMode.allCases, id: \.self) { mode in
-                                Text(mode.rawValue).tag(mode)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .frame(width: 200)
-                        .onChange(of: base64ProcessMode) { _, _ in
-                            processInput()
-                        }
                     }
                 }
                 
@@ -229,12 +216,8 @@ struct ToolDetailView: View {
         switch selectedTool {
         case .jsonFormatter:
             formatJSON()
-        case .base64:
-            processBase64()
         case .jwt:
             decodeJWT()
-        case .hash:
-            generateHash()
         }
     }
     
@@ -282,26 +265,6 @@ struct ToolDetailView: View {
         return []
     }
     
-    // MARK: - Base64
-    func processBase64() {
-        if base64ProcessMode == .decode {
-            // Decode
-            if let data = Data(base64Encoded: inputText),
-               let decoded = String(data: data, encoding: .utf8) {
-                outputText = decoded
-            } else {
-                outputText = "Failed to decode Base64"
-            }
-        } else {
-            // Encode
-            if let data = inputText.data(using: .utf8) {
-                outputText = data.base64EncodedString()
-            } else {
-                outputText = "Failed to encode Base64"
-            }
-        }
-    }
-    
     // MARK: - JWT Decoder
     func decodeJWT() {
         let parts = inputText.split(separator: ".")
@@ -347,25 +310,6 @@ struct ToolDetailView: View {
         return prettyString
     }
     
-    // MARK: - Hash Generator
-    func generateHash() {
-        guard let data = inputText.data(using: .utf8) else {
-            outputText = "Failed to generate hash"
-            return
-        }
-        
-        let md5 = data.md5Hash
-        let sha1 = data.sha1Hash
-        let sha256 = data.sha256Hash
-        
-        outputText = """
-        MD5: \(md5)
-        
-        SHA-1: \(sha1)
-        
-        SHA-256: \(sha256)
-        """
-    }
 }
 
 
@@ -376,27 +320,6 @@ extension NSNumber {
     }
 }
 
-extension Data {
-    var md5Hash: String {
-        let digest = Insecure.MD5.hash(data: self)
-        return digest.map { String(format: "%02hhx", $0) }.joined()
-    }
-    
-    var sha1Hash: String {
-        let digest = Insecure.SHA1.hash(data: self)
-        return digest.map { String(format: "%02hhx", $0) }.joined()
-    }
-    
-    var sha256Hash: String {
-        let digest = SHA256.hash(data: self)
-        return digest.map { String(format: "%02hhx", $0) }.joined()
-    }
-    
-    var sha512Hash: String {
-        let digest = SHA512.hash(data: self)
-        return digest.map { String(format: "%02hhx", $0) }.joined()
-    }
-}
 
 
 // MARK: - Preview
