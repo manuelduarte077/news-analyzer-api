@@ -55,7 +55,6 @@ struct ContentView: View {
 struct ToolDetailView: View {
     let selectedTool: ToolType
     @AppStorage("viewMode") private var viewMode: ViewMode = .text
-    @AppStorage("processMode_url") private var urlProcessMode: ProcessMode = .encode
     @AppStorage("processMode_base64") private var base64ProcessMode: ProcessMode = .encode
     @State private var inputText: String = ""
     @State private var outputText: String = ""
@@ -84,17 +83,6 @@ struct ToolDetailView: View {
                         }
                         .pickerStyle(.segmented)
                         .frame(width: 200)
-                    } else if selectedTool == .urlEncodeDecode {
-                        Picker("Process Mode", selection: $urlProcessMode) {
-                            ForEach(ProcessMode.allCases, id: \.self) { mode in
-                                Text(mode.rawValue).tag(mode)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .frame(width: 200)
-                        .onChange(of: urlProcessMode) { _, _ in
-                            processInput()
-                        }
                     } else if selectedTool == .base64 {
                         Picker("Process Mode", selection: $base64ProcessMode) {
                             ForEach(ProcessMode.allCases, id: \.self) { mode in
@@ -241,14 +229,10 @@ struct ToolDetailView: View {
         switch selectedTool {
         case .jsonFormatter:
             formatJSON()
-        case .urlEncodeDecode:
-            processURL()
         case .base64:
             processBase64()
         case .jwt:
             decodeJWT()
-        case .textCase:
-            processTextCase()
         case .hash:
             generateHash()
         }
@@ -296,25 +280,6 @@ struct ToolDetailView: View {
             return [JSONNode(key: key, value: "null", type: .null)]
         }
         return []
-    }
-    
-    // MARK: - URL Encode/Decode
-    func processURL() {
-        if urlProcessMode == .decode {
-            // Decode
-            if let decoded = inputText.removingPercentEncoding {
-                outputText = decoded
-            } else {
-                outputText = "Failed to decode URL"
-            }
-        } else {
-            // Encode
-            if let encoded = inputText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                outputText = encoded
-            } else {
-                outputText = "Failed to encode URL"
-            }
-        }
     }
     
     // MARK: - Base64
@@ -380,45 +345,6 @@ struct ToolDetailView: View {
         }
         
         return prettyString
-    }
-    
-    // MARK: - Text Case
-    func processTextCase() {
-        let lines = [
-            "lowercase: \(inputText.lowercased())",
-            "UPPERCASE: \(inputText.uppercased())",
-            "Title Case: \(inputText.capitalized)",
-            "camelCase: \(toCamelCase(inputText))",
-            "PascalCase: \(toPascalCase(inputText))",
-            "snake_case: \(toSnakeCase(inputText))",
-            "kebab-case: \(toKebabCase(inputText))"
-        ]
-        outputText = lines.joined(separator: "\n\n")
-    }
-    
-    func toCamelCase(_ text: String) -> String {
-        let words = text.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
-        guard !words.isEmpty else { return text }
-        return words[0].lowercased() + words.dropFirst().map { $0.capitalized }.joined()
-    }
-    
-    func toPascalCase(_ text: String) -> String {
-        let words = text.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
-        return words.map { $0.capitalized }.joined()
-    }
-    
-    func toSnakeCase(_ text: String) -> String {
-        return text.components(separatedBy: CharacterSet.alphanumerics.inverted)
-            .filter { !$0.isEmpty }
-            .joined(separator: "_")
-            .lowercased()
-    }
-    
-    func toKebabCase(_ text: String) -> String {
-        return text.components(separatedBy: CharacterSet.alphanumerics.inverted)
-            .filter { !$0.isEmpty }
-            .joined(separator: "-")
-            .lowercased()
     }
     
     // MARK: - Hash Generator
