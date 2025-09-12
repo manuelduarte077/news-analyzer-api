@@ -25,11 +25,87 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             // Sidebar
-            List(ToolType.allCases, id: \.self, selection: $selectedTool) { tool in
-                Label(tool.rawValue, systemImage: tool.icon)
-                    .tag(tool as ToolType?)
+            VStack(spacing: 0) {
+                // Tools List
+                List(ToolType.allCases, id: \.self, selection: $selectedTool) { tool in
+                    Label(tool.rawValue, systemImage: tool.icon)
+                        .tag(tool as ToolType?)
+                }
+                .navigationTitle("Codebeautify")
+                
+                Divider()
+                
+                // Developer Info Section
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "person.fill")
+                                .font(.title3)
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Manuel Duarte")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            Text("iOS Developer")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    
+                    // Contact information
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "envelope.fill")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                                .frame(width: 12)
+                            Text("dev@donmanuel.com")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        HStack(spacing: 8) {
+                            Image(systemName: "globe")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                                .frame(width: 12)
+                            Text("donmanuel.dev")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        HStack(spacing: 8) {
+                            Image(systemName: "app.badge")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .frame(width: 12)
+                            Text("Version 1.0")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.customSecondaryBackground)
+                        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+                )
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
             }
-            .navigationTitle("Dev Toolbox")
             #if os(macOS)
             .navigationSplitViewColumnWidth(min: 200, ideal: 250)
             #endif
