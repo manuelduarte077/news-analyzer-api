@@ -229,11 +229,15 @@ struct ToolDetailView: View {
                             .padding(.top, 8)
                             
                             ScrollView {
-                                Text(outputText)
-                                    .font(.system(.body, design: .monospaced))
-                                    .textSelection(.enabled)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                                    .padding()
+                                if isCodeOutput(outputText) {
+                                    SyntaxHighlighter(code: outputText, language: detectLanguage(outputText))
+                                } else {
+                                    Text(outputText)
+                                        .font(.system(.body, design: .monospaced))
+                                        .textSelection(.enabled)
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                        .padding()
+                                }
                             }
                             .background(Color.customBackground)
                             .cornerRadius(8)
@@ -340,11 +344,73 @@ struct ToolDetailView: View {
             return [JSONNode(key: key, value: "null", type: .null)]
         }
         return []
+        }
+        
     }
     
-}
-
-// MARK: - Extensions
+    // MARK: - Code Detection
+    private func isCodeOutput(_ text: String) -> Bool {
+        // Check if the output looks like generated code
+        let codeIndicators = [
+            "import ", "class ", "struct ", "interface ", "function ", "public class",
+            "<?php", "using ", "namespace ", "export ", "interface ", "type ",
+            "data class", "object ", "enum ", "protocol ", "extension "
+        ]
+        
+        return codeIndicators.contains { text.contains($0) }
+    }
+    
+    private func detectLanguage(_ text: String) -> ExportLanguage {
+        // Swift indicators
+        if text.contains("import Foundation") || text.contains("struct ") || text.contains(": Codable") {
+            return .swift
+        }
+        
+        // Kotlin indicators
+        if text.contains("data class") || text.contains("import com.google.gson") {
+            return .kotlin
+        }
+        
+        // Java indicators
+        if text.contains("public class") && text.contains("import com.google.gson") {
+            return .java
+        }
+        
+        // C# indicators
+        if text.contains("using System") || text.contains("using Newtonsoft") {
+            return .csharp
+        }
+        
+        // TypeScript indicators
+        if text.contains("export interface") || text.contains(": string") || text.contains(": number") {
+            return .typescript
+        }
+        
+        // JavaScript indicators
+        if text.contains("class ") && text.contains("module.exports") {
+            return .javascript
+        }
+        
+        // Dart indicators
+        if text.contains("class ") && text.contains("final ") && text.contains("required this") {
+            return .dart
+        }
+        
+        // Objective-C indicators
+        if text.contains("#import") && text.contains("@interface") {
+            return .objectivec
+        }
+        
+        // PHP indicators
+        if text.contains("<?php") || text.contains("class ") && text.contains("public $") {
+            return .php
+        }
+        
+        // Default to Swift if no specific language detected
+        return .swift
+    }
+    
+    // MARK: - Extensions
 extension NSNumber {
     var isBool: Bool {
         CFBooleanGetTypeID() == CFGetTypeID(self)
