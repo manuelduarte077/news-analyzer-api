@@ -110,13 +110,7 @@ struct ExportOptionsView: View {
                             Spacer()
                         }
                         
-                        ScrollView {
-                            Text(exportOutput)
-                                .font(.system(.caption, design: .monospaced))
-                                .textSelection(.enabled)
-                                .frame(maxWidth: .infinity, alignment: .topLeading)
-                                .padding(12)
-                        }
+                        SyntaxHighlighter(code: exportOutput, language: selectedLanguage)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(Color.customBackground)
