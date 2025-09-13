@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Foundation
+import UniformTypeIdentifiers
 
 
 enum ViewMode: String, CaseIterable {
@@ -179,6 +180,7 @@ struct ToolDetailView: View {
     @State private var selectedExportLanguage: ExportLanguage = .swift
     @State private var showExportOptions: Bool = false
     @State private var exportOutput: String = ""
+    @State private var exportFileName: String = "GeneratedModel"
     
     var body: some View {
         VStack(spacing: 0) {
@@ -216,12 +218,6 @@ struct ToolDetailView: View {
                     .buttonStyle(.bordered)
                     .disabled(outputText.isEmpty)
                     
-                    if selectedTool == .jsonFormatter && !outputText.isEmpty {
-                        Button(action: { showExportOptions = true }) {
-                            Label("Export", systemImage: "square.and.arrow.up")
-                        }
-                        .buttonStyle(.bordered)
-                    }
                     
                     Spacer()
                 }
@@ -274,10 +270,21 @@ struct ToolDetailView: View {
                         
                         // Output
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Output")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.top, 8)
+                            HStack {
+                                Text("Output")
+                                    .font(.headline)
+                                
+                                Spacer()
+                                
+                                if selectedTool == .jsonFormatter && !outputText.isEmpty {
+                                    Button(action: { showExportOptions = true }) {
+                                        Label("Export", systemImage: "square.and.arrow.up")
+                                    }
+                                    .buttonStyle(.bordered)
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
                             
                             ScrollView {
                                 Text(outputText)
@@ -311,6 +318,7 @@ struct ToolDetailView: View {
             ExportOptionsView(
                 selectedLanguage: $selectedExportLanguage,
                 exportOutput: $exportOutput,
+                exportFileName: $exportFileName,
                 jsonData: outputText
             )
         }
@@ -455,16 +463,48 @@ extension NSNumber {
 struct ExportOptionsView: View {
     @Binding var selectedLanguage: ExportLanguage
     @Binding var exportOutput: String
+    @Binding var exportFileName: String
     let jsonData: String
     @Environment(\.dismiss) private var dismiss
     @State private var showCopiedAlert = false
+    @State private var showSaveDialog = false
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
+                // Header Section
+                VStack(spacing: 16) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                        Text("Export JSON to Code")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    }
+                    
+                    // File Name Input
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("File Name")
+                            .font(.headline)
+                        HStack {
+                            TextField("Enter file name", text: $exportFileName)
+                                .textFieldStyle(.roundedBorder)
+                            
+                            Text(".\(selectedLanguage.fileExtension)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(4)
+                        }
+                    }
+                }
+                
                 // Language Selection
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Select Language")
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Select Programming Language")
                         .font(.headline)
                     
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 12) {
@@ -482,12 +522,17 @@ struct ExportOptionsView: View {
                                         .font(.caption)
                                         .fontWeight(.medium)
                                         .foregroundColor(selectedLanguage == language ? .white : .primary)
+                                        .multilineTextAlignment(.center)
                                 }
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
+                                .padding(.vertical, 16)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: 12)
                                         .fill(selectedLanguage == language ? Color.blue : Color.gray.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(selectedLanguage == language ? Color.blue : Color.clear, lineWidth: 2)
+                                        )
                                 )
                             }
                             .buttonStyle(.plain)
@@ -495,17 +540,25 @@ struct ExportOptionsView: View {
                     }
                 }
                 
-                // Export Output
-                VStack(alignment: .leading, spacing: 8) {
+                // Generated Code Preview
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Generated Code")
+                        Text("Generated Code Preview")
                             .font(.headline)
                         Spacer()
-                        Button(action: copyExport) {
-                            Label("Copy", systemImage: "doc.on.doc")
+                        HStack(spacing: 12) {
+                            Button(action: copyExport) {
+                                Label("Copy", systemImage: "doc.on.doc")
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(exportOutput.isEmpty)
+                            
+                            Button(action: { showSaveDialog = true }) {
+                                Label("Save File", systemImage: "square.and.arrow.down")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(exportOutput.isEmpty)
                         }
-                        .buttonStyle(.bordered)
-                        .disabled(exportOutput.isEmpty)
                     }
                     
                     ScrollView {
@@ -517,13 +570,13 @@ struct ExportOptionsView: View {
                     }
                     .background(Color.customBackground)
                     .cornerRadius(8)
-                    .frame(maxHeight: 300)
+                    .frame(maxHeight: 250)
                 }
                 
                 Spacer()
             }
-            .padding()
-            .navigationTitle("Export to \(selectedLanguage.rawValue)")
+            .padding(24)
+            .navigationTitle("Export Code")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -537,6 +590,19 @@ struct ExportOptionsView: View {
         } message: {
             Text("Code copied to clipboard")
         }
+        .fileExporter(
+            isPresented: $showSaveDialog,
+            document: CodeDocument(content: exportOutput),
+            contentType: .plainText,
+            defaultFilename: "\(exportFileName).\(selectedLanguage.fileExtension)"
+        ) { result in
+            switch result {
+            case .success(let url):
+                print("File saved to: \(url)")
+            case .failure(let error):
+                print("Error saving file: \(error)")
+            }
+        }
         .onAppear {
             generateExport()
         }
@@ -549,7 +615,7 @@ struct ExportOptionsView: View {
             return
         }
         
-        exportOutput = generateCodeForLanguage(json: json, language: selectedLanguage)
+        exportOutput = generateCodeForLanguage(json: json, language: selectedLanguage, className: exportFileName)
     }
     
     private func copyExport() {
@@ -559,10 +625,32 @@ struct ExportOptionsView: View {
     }
 }
 
-// MARK: - Code Generation Logic
-func generateCodeForLanguage(json: Any, language: ExportLanguage) -> String {
-    let className = "GeneratedModel"
+// MARK: - Code Document for File Export
+struct CodeDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.plainText] }
     
+    var content: String
+    
+    init(content: String) {
+        self.content = content
+    }
+    
+    init(configuration: ReadConfiguration) throws {
+        guard let data = configuration.file.regularFileContents,
+              let string = String(data: data, encoding: .utf8) else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        content = string
+    }
+    
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        let data = content.data(using: .utf8)!
+        return .init(regularFileWithContents: data)
+    }
+}
+
+// MARK: - Code Generation Logic
+func generateCodeForLanguage(json: Any, language: ExportLanguage, className: String) -> String {
     switch language {
     case .swift:
         return generateSwiftCode(json: json, className: className)
