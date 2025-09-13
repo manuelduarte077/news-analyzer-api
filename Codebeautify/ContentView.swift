@@ -295,8 +295,6 @@ struct ToolDetailView: View {
         switch selectedTool {
         case .jsonFormatter:
             formatJSON()
-        case .jwt:
-            decodeJWT()
         }
     }
     
@@ -344,50 +342,6 @@ struct ToolDetailView: View {
         return []
     }
     
-    // MARK: - JWT Decoder
-    func decodeJWT() {
-        let parts = inputText.split(separator: ".")
-        guard parts.count == 3 else {
-            outputText = "Invalid JWT format"
-            return
-        }
-        
-        var result = "=== JWT Decoded ===\n\n"
-        
-        // Decode header
-        if let header = decodeJWTPart(String(parts[0])) {
-            result += "Header:\n\(header)\n\n"
-        }
-        
-        // Decode payload
-        if let payload = decodeJWTPart(String(parts[1])) {
-            result += "Payload:\n\(payload)\n\n"
-        }
-        
-        result += "Signature:\n\(parts[2])"
-        
-        outputText = result
-    }
-    
-    func decodeJWTPart(_ part: String) -> String? {
-        var base64 = part
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        
-        let remainder = base64.count % 4
-        if remainder > 0 {
-            base64 += String(repeating: "=", count: 4 - remainder)
-        }
-        
-        guard let data = Data(base64Encoded: base64),
-              let json = try? JSONSerialization.jsonObject(with: data),
-              let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
-              let prettyString = String(data: prettyData, encoding: .utf8) else {
-            return nil
-        }
-        
-        return prettyString
-    }
 }
 
 // MARK: - Extensions

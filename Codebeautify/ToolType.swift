@@ -10,12 +10,10 @@ import Foundation
 // MARK: - Enums
 enum ToolType: String, CaseIterable {
     case jsonFormatter = "JSON Formatter"
-    case jwt = "JWT Decoder"
     
     var icon: String {
         switch self {
         case .jsonFormatter: return "curlybraces"
-        case .jwt: return "key"
         }
     }
     
