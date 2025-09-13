@@ -108,7 +108,7 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getTypeScriptType(value)
+                let type = getTypeScriptType(value, key: key)
                 code += "    \(propertyName): \(type);\n"
             }
         }
@@ -137,11 +137,26 @@ struct CodeGenerator {
     
     // MARK: - JavaScript Code Generation
     private static func generateJavaScriptCode(json: Any, className: String) -> String {
-        var code = "class \(className) {\n"
-        code += "    constructor(data) {\n"
+        var code = "/**\n"
+        code += " * @typedef {Object} \(className)\n"
         
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
+                let propertyName = toCamelCase(key)
+                let type = getJSDocType(value, key: key)
+                code += " * @property {\(type)} \(propertyName) - \(key)\n"
+            }
+        }
+        
+        code += " */\n\n"
+        code += "class \(className) {\n"
+        code += "    /**\n"
+        code += "     * @param {Object} data - The data object\n"
+        code += "     */\n"
+        code += "    constructor(data) {\n"
+        
+        if let dict = json as? [String: Any] {
+            for (key, _) in dict {
                 let propertyName = toCamelCase(key)
                 code += "        this.\(propertyName) = data.\(key);\n"
             }
@@ -199,12 +214,12 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getPHPType(value)
+                _ = getPHPType(value)
                 code += "    public $\(propertyName);\n"
             }
             
             code += "\n    public function __construct($data) {\n"
-            for (key, value) in dict {
+            for (key, _) in dict {
                 let propertyName = toCamelCase(key)
                 code += "        $this->\(propertyName) = $data['\(key)'] ?? null;\n"
             }
@@ -259,15 +274,63 @@ struct CodeGenerator {
         }
     }
     
-    private static func getTypeScriptType(_ value: Any) -> String {
+    private static func getTypeScriptType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "string"
         case is Int: return "number"
         case is Double: return "number"
         case is Bool: return "boolean"
-        case is [Any]: return "any[]"
-        case is [String: Any]: return "Record<string, any>"
-        default: return "any"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getTypeScriptType(array.first!, key: key)
+                return "\(elementType)[]"
+            }
+            return "unknown[]"
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                var properties: [String] = []
+                for (propKey, propValue) in dict {
+                    let propType = getTypeScriptType(propValue, key: propKey)
+                    properties.append("\(propKey): \(propType)")
+                }
+                if properties.isEmpty {
+                    return "Record<string, unknown>"
+                }
+                return "{ \(properties.joined(separator: "; ")) }"
+            }
+            return "Record<string, unknown>"
+        case is NSNull: return "null"
+        default: return "unknown"
+        }
+    }
+    
+    private static func getJSDocType(_ value: Any, key: String) -> String {
+        switch value {
+        case is String: return "string"
+        case is Int: return "number"
+        case is Double: return "number"
+        case is Bool: return "boolean"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getJSDocType(array.first!, key: key)
+                return "\(elementType)[]"
+            }
+            return "Array"
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                var properties: [String] = []
+                for (propKey, propValue) in dict {
+                    let propType = getJSDocType(propValue, key: propKey)
+                    properties.append("\(propKey): \(propType)")
+                }
+                if properties.isEmpty {
+                    return "Object"
+                }
+                return "{\(properties.joined(separator: ", "))}"
+            }
+            return "Object"
+        case is NSNull: return "null"
+        default: return "*"
         }
     }
     

@@ -33,7 +33,7 @@ struct SyntaxHighlighter: View {
     }
     
     private func highlightCode(_ code: String, for language: ExportLanguage) -> AttributedString {
-        var attributedString = AttributedString(code)
+        let attributedString = AttributedString(code)
         
         switch language {
         case .swift:
