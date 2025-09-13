@@ -19,6 +19,46 @@ enum ProcessMode: String, CaseIterable {
     case decode = "Decode"
 }
 
+enum ExportLanguage: String, CaseIterable {
+    case java = "Java"
+    case kotlin = "Kotlin"
+    case csharp = "C#"
+    case swift = "Swift"
+    case objectivec = "Objective-C"
+    case dart = "Dart"
+    case typescript = "TypeScript"
+    case javascript = "JavaScript"
+    case php = "PHP"
+    
+    var fileExtension: String {
+        switch self {
+        case .java: return "java"
+        case .kotlin: return "kt"
+        case .csharp: return "cs"
+        case .swift: return "swift"
+        case .objectivec: return "h"
+        case .dart: return "dart"
+        case .typescript: return "ts"
+        case .javascript: return "js"
+        case .php: return "php"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .java: return "cup.and.saucer"
+        case .kotlin: return "k.circle"
+        case .csharp: return "c.circle"
+        case .swift: return "swift"
+        case .objectivec: return "o.circle"
+        case .dart: return "d.circle"
+        case .typescript: return "t.circle"
+        case .javascript: return "j.circle"
+        case .php: return "p.circle"
+        }
+    }
+}
+
 // MARK: - Main View
 struct ContentView: View {
     @State private var selectedTool: ToolType?
@@ -136,6 +176,9 @@ struct ToolDetailView: View {
     @State private var errorMessage: String = ""
     @State private var jsonNodes: [JSONNode] = []
     @State private var showCopiedAlert: Bool = false
+    @State private var selectedExportLanguage: ExportLanguage = .swift
+    @State private var showExportOptions: Bool = false
+    @State private var exportOutput: String = ""
     
     var body: some View {
         VStack(spacing: 0) {
@@ -172,6 +215,13 @@ struct ToolDetailView: View {
                     }
                     .buttonStyle(.bordered)
                     .disabled(outputText.isEmpty)
+                    
+                    if selectedTool == .jsonFormatter && !outputText.isEmpty {
+                        Button(action: { showExportOptions = true }) {
+                            Label("Export", systemImage: "square.and.arrow.up")
+                        }
+                        .buttonStyle(.bordered)
+                    }
                     
                     Spacer()
                 }
@@ -257,6 +307,13 @@ struct ToolDetailView: View {
         } message: {
             Text("Output copied to clipboard")
         }
+        .sheet(isPresented: $showExportOptions) {
+            ExportOptionsView(
+                selectedLanguage: $selectedExportLanguage,
+                exportOutput: $exportOutput,
+                jsonData: outputText
+            )
+        }
         .onAppear {
             // Load saved input from UserDefaults
             inputText = UserDefaults.standard.string(forKey: selectedTool.storageKey) ?? ""
@@ -273,12 +330,8 @@ struct ToolDetailView: View {
     }
     
     func onClickCopy() {
-#if os(iOS)
-        UIPasteboard.general.string = outputText
-#elseif os(macOS)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(outputText, forType: .string)
-#endif
         showCopiedAlert = true
     }
     
@@ -397,6 +450,422 @@ extension NSNumber {
 }
 
 
+
+// MARK: - Export Options View
+struct ExportOptionsView: View {
+    @Binding var selectedLanguage: ExportLanguage
+    @Binding var exportOutput: String
+    let jsonData: String
+    @Environment(\.dismiss) private var dismiss
+    @State private var showCopiedAlert = false
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                // Language Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select Language")
+                        .font(.headline)
+                    
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 12) {
+                        ForEach(ExportLanguage.allCases, id: \.self) { language in
+                            Button(action: {
+                                selectedLanguage = language
+                                generateExport()
+                            }) {
+                                VStack(spacing: 8) {
+                                    Image(systemName: language.icon)
+                                        .font(.title2)
+                                        .foregroundColor(selectedLanguage == language ? .white : .blue)
+                                    
+                                    Text(language.rawValue)
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(selectedLanguage == language ? .white : .primary)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(selectedLanguage == language ? Color.blue : Color.gray.opacity(0.1))
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+                
+                // Export Output
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Generated Code")
+                            .font(.headline)
+                        Spacer()
+                        Button(action: copyExport) {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(exportOutput.isEmpty)
+                    }
+                    
+                    ScrollView {
+                        Text(exportOutput)
+                            .font(.system(.body, design: .monospaced))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .padding()
+                    }
+                    .background(Color.customBackground)
+                    .cornerRadius(8)
+                    .frame(maxHeight: 300)
+                }
+                
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Export to \(selectedLanguage.rawValue)")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .alert("Copied!", isPresented: $showCopiedAlert) {
+            Button("OK") { }
+        } message: {
+            Text("Code copied to clipboard")
+        }
+        .onAppear {
+            generateExport()
+        }
+    }
+    
+    private func generateExport() {
+        guard let data = jsonData.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) else {
+            exportOutput = "Invalid JSON data"
+            return
+        }
+        
+        exportOutput = generateCodeForLanguage(json: json, language: selectedLanguage)
+    }
+    
+    private func copyExport() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(exportOutput, forType: .string)
+        showCopiedAlert = true
+    }
+}
+
+// MARK: - Code Generation Logic
+func generateCodeForLanguage(json: Any, language: ExportLanguage) -> String {
+    let className = "GeneratedModel"
+    
+    switch language {
+    case .swift:
+        return generateSwiftCode(json: json, className: className)
+    case .kotlin:
+        return generateKotlinCode(json: json, className: className)
+    case .java:
+        return generateJavaCode(json: json, className: className)
+    case .csharp:
+        return generateCSharpCode(json: json, className: className)
+    case .typescript:
+        return generateTypeScriptCode(json: json, className: className)
+    case .javascript:
+        return generateJavaScriptCode(json: json, className: className)
+    case .dart:
+        return generateDartCode(json: json, className: className)
+    case .objectivec:
+        return generateObjectiveCCode(json: json, className: className)
+    case .php:
+        return generatePHPCode(json: json, className: className)
+    }
+}
+
+// MARK: - Swift Code Generation
+func generateSwiftCode(json: Any, className: String) -> String {
+    var code = "import Foundation\n\n"
+    code += "struct \(className): Codable {\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getSwiftType(value)
+            code += "    let \(propertyName): \(type)\n"
+        }
+    }
+    
+    code += "}\n"
+    return code
+}
+
+// MARK: - Kotlin Code Generation
+func generateKotlinCode(json: Any, className: String) -> String {
+    var code = "import com.google.gson.annotations.SerializedName\n\n"
+    code += "data class \(className)(\n"
+    
+    if let dict = json as? [String: Any] {
+        let properties = dict.map { (key, value) in
+            let propertyName = toCamelCase(key)
+            let type = getKotlinType(value)
+            return "    @SerializedName(\"\(key)\")\n    val \(propertyName): \(type)"
+        }
+        code += properties.joined(separator: ",\n")
+    }
+    
+    code += "\n)"
+    return code
+}
+
+// MARK: - Java Code Generation
+func generateJavaCode(json: Any, className: String) -> String {
+    var code = "import com.google.gson.annotations.SerializedName;\n\n"
+    code += "public class \(className) {\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in
+        dict {
+            let propertyName = toCamelCase(key)
+            let type = getJavaType(value)
+            code += "    @SerializedName(\"\(key)\")\n"
+            code += "    private \(type) \(propertyName);\n\n"
+        }
+        
+        // Getters and Setters
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getJavaType(value)
+            let capitalizedName = propertyName.prefix(1).uppercased() + propertyName.dropFirst()
+            
+            code += "    public \(type) get\(capitalizedName)() {\n"
+            code += "        return \(propertyName);\n"
+            code += "    }\n\n"
+            
+            code += "    public void set\(capitalizedName)(\(type) \(propertyName)) {\n"
+            code += "        this.\(propertyName) = \(propertyName);\n"
+            code += "    }\n\n"
+        }
+    }
+    
+    code += "}"
+    return code
+}
+
+// MARK: - TypeScript Code Generation
+func generateTypeScriptCode(json: Any, className: String) -> String {
+    var code = "export interface \(className) {\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getTypeScriptType(value)
+            code += "    \(propertyName): \(type);\n"
+        }
+    }
+    
+    code += "}"
+    return code
+}
+
+// MARK: - Helper Functions
+func toCamelCase(_ text: String) -> String {
+    let words = text.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
+    guard !words.isEmpty else { return text }
+    return words[0].lowercased() + words.dropFirst().map { $0.capitalized }.joined()
+}
+
+func getSwiftType(_ value: Any) -> String {
+    switch value {
+    case is String: return "String"
+    case is Int: return "Int"
+    case is Double: return "Double"
+    case is Bool: return "Bool"
+    case is [Any]: return "[Any]"
+    case is [String: Any]: return "[String: Any]"
+    default: return "Any"
+    }
+}
+
+func getKotlinType(_ value: Any) -> String {
+    switch value {
+    case is String: return "String"
+    case is Int: return "Int"
+    case is Double: return "Double"
+    case is Bool: return "Boolean"
+    case is [Any]: return "List<Any>"
+    case is [String: Any]: return "Map<String, Any>"
+    default: return "Any"
+    }
+}
+
+func getJavaType(_ value: Any) -> String {
+    switch value {
+    case is String: return "String"
+    case is Int: return "Integer"
+    case is Double: return "Double"
+    case is Bool: return "Boolean"
+    case is [Any]: return "List<Object>"
+    case is [String: Any]: return "Map<String, Object>"
+    default: return "Object"
+    }
+}
+
+func getTypeScriptType(_ value: Any) -> String {
+    switch value {
+    case is String: return "string"
+    case is Int: return "number"
+    case is Double: return "number"
+    case is Bool: return "boolean"
+    case is [Any]: return "any[]"
+    case is [String: Any]: return "Record<string, any>"
+    default: return "any"
+    }
+}
+
+// MARK: - Additional Language Generators (Simplified)
+func generateCSharpCode(json: Any, className: String) -> String {
+    var code = "using System;\nusing Newtonsoft.Json;\n\n"
+    code += "public class \(className)\n{\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getCSharpType(value)
+            code += "    [JsonProperty(\"\(key)\")]\n"
+            code += "    public \(type) \(propertyName) { get; set; }\n\n"
+        }
+    }
+    
+    code += "}"
+    return code
+}
+
+func generateJavaScriptCode(json: Any, className: String) -> String {
+    var code = "class \(className) {\n"
+    code += "    constructor(data) {\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            code += "        this.\(propertyName) = data.\(key);\n"
+        }
+    }
+    
+    code += "    }\n"
+    code += "}\n\n"
+    code += "module.exports = \(className);"
+    return code
+}
+
+func generateDartCode(json: Any, className: String) -> String {
+    var code = "class \(className) {\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getDartType(value)
+            code += "    final \(type) \(propertyName);\n"
+        }
+        
+        code += "\n    \(className)({"
+        let params = dict.keys.map { "required this.\(toCamelCase($0))" }.joined(separator: ", ")
+        code += params
+        code += "});\n"
+    }
+    
+    code += "}"
+    return code
+}
+
+func generateObjectiveCCode(json: Any, className: String) -> String {
+    var code = "#import <Foundation/Foundation.h>\n\n"
+    code += "@interface \(className) : NSObject\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getObjectiveCType(value)
+            code += "@property (nonatomic, strong) \(type) *\(propertyName);\n"
+        }
+    }
+    
+    code += "@end"
+    return code
+}
+
+func generatePHPCode(json: Any, className: String) -> String {
+    var code = "<?php\n\n"
+    code += "class \(className) {\n"
+    
+    if let dict = json as? [String: Any] {
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            let type = getPHPType(value)
+            code += "    public $\(propertyName);\n"
+        }
+        
+        code += "\n    public function __construct($data) {\n"
+        for (key, value) in dict {
+            let propertyName = toCamelCase(key)
+            code += "        $this->\(propertyName) = $data['\(key)'] ?? null;\n"
+        }
+        code += "    }\n"
+    }
+    
+    code += "}"
+    return code
+}
+
+func getCSharpType(_ value: Any) -> String {
+    switch value {
+    case is String: return "string"
+    case is Int: return "int"
+    case is Double: return "double"
+    case is Bool: return "bool"
+    case is [Any]: return "List<object>"
+    case is [String: Any]: return "Dictionary<string, object>"
+    default: return "object"
+    }
+}
+
+func getDartType(_ value: Any) -> String {
+    switch value {
+    case is String: return "String"
+    case is Int: return "int"
+    case is Double: return "double"
+    case is Bool: return "bool"
+    case is [Any]: return "List<dynamic>"
+    case is [String: Any]: return "Map<String, dynamic>"
+    default: return "dynamic"
+    }
+}
+
+func getObjectiveCType(_ value: Any) -> String {
+    switch value {
+    case is String: return "NSString"
+    case is Int: return "NSNumber"
+    case is Double: return "NSNumber"
+    case is Bool: return "NSNumber"
+    case is [Any]: return "NSArray"
+    case is [String: Any]: return "NSDictionary"
+    default: return "id"
+    }
+}
+
+func getPHPType(_ value: Any) -> String {
+    switch value {
+    case is String: return "string"
+    case is Int: return "int"
+    case is Double: return "float"
+    case is Bool: return "bool"
+    case is [Any]: return "array"
+    case is [String: Any]: return "array"
+    default: return "mixed"
+    }
+}
 
 // MARK: - Preview
 #Preview {
