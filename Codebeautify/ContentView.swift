@@ -391,19 +391,9 @@ struct ToolDetailView: View {
             return .javascript
         }
         
-        // Dart indicators
-        if text.contains("class ") && text.contains("final ") && text.contains("required this") {
-            return .dart
-        }
-        
         // Objective-C indicators
         if text.contains("#import") && text.contains("@interface") {
             return .objectivec
-        }
-        
-        // PHP indicators
-        if text.contains("<?php") || text.contains("class ") && text.contains("public $") {
-            return .php
         }
         
         // Default to Swift if no specific language detected

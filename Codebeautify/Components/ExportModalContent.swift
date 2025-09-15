@@ -26,7 +26,7 @@ struct ExportModalContent: View {
             Divider()
             actionButtonsSection
         }
-        .frame(width: 500, height: 600)
+        .frame(width: 700, height: 700)
         .background(Color(.windowBackgroundColor))
         .cornerRadius(12)
         .shadow(radius: 20)
@@ -37,14 +37,42 @@ struct ExportModalContent: View {
     
     // MARK: - View Sections
     private var headerSection: some View {
-        HStack {
-            Image(systemName: "square.and.arrow.up")
-                .font(.title2)
-                .foregroundColor(.blue)
-            Text("Export...")
-                .font(.title2)
-                .fontWeight(.semibold)
-            Spacer()
+        VStack(spacing: 12) {
+            HStack(spacing: 16) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.blue.opacity(0.1))
+                        .frame(width: 50, height: 50)
+                    
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.title2)
+                        .foregroundColor(.blue)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Export JSON to Code")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Generate type-safe code models from your JSON data")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+            }
+            
+            // Language indicator
+            HStack {
+                Image(systemName: selectedLanguage.icon)
+                    .foregroundColor(.blue)
+                Text("Selected: \(selectedLanguage.rawValue)")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -63,15 +91,21 @@ struct ExportModalContent: View {
     }
     
     private var fileNameSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("File Name")
                 .font(.headline)
                 .foregroundColor(.primary)
             
-            HStack(spacing: 8) {
-                TextField("test", text: $exportFileName)
+            HStack(spacing: 12) {
+                TextField("GeneratedModel", text: $exportFileName)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(.body, design: .monospaced))
+                    .onChange(of: exportFileName) { _, _ in
+                        // Trigger regeneration when file name changes
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            onAppear()
+                        }
+                    }
                 
                 Text(".\(selectedLanguage.fileExtension)")
                     .font(.system(.body, design: .monospaced))
@@ -82,6 +116,12 @@ struct ExportModalContent: View {
             }
         }
         .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.gray.opacity(0.2))
+        )
+        .padding(.horizontal, 20)
     }
     
     private var fileExtensionBackground: some View {
@@ -90,10 +130,18 @@ struct ExportModalContent: View {
     }
     
     private var languageSelectionSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Select Programming Language")
-                .font(.headline)
-                .foregroundColor(.primary)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Select Programming Language")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                Text("\(ExportLanguage.allCases.count) languages available")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
             
             LazyVGrid(columns: languageGridColumns, spacing: 12) {
                 ForEach(ExportLanguage.allCases, id: \.self) { language in
@@ -102,50 +150,100 @@ struct ExportModalContent: View {
                         isSelected: selectedLanguage == language,
                         action: {
                             selectedLanguage = language
+                            // Trigger regeneration when language changes
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                onAppear()
+                            }
                         }
                     )
                 }
             }
         }
         .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.gray.opacity(0.1))
+        )
+        .padding(.horizontal, 20)
     }
     
     private var codePreviewSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Generated Code Preview")
-                    .font(.headline)
-                    .foregroundColor(.primary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Generated Code Preview")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Text("\(selectedLanguage.rawValue) • \(exportOutput.components(separatedBy: .newlines).count) lines")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
                 Spacer()
+                
+                HStack(spacing: 8) {
+                    Button(action: onCopy) {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(exportOutput.isEmpty)
+                    .controlSize(.small)
+                }
             }
             
-            SyntaxHighlighter(code: exportOutput, language: selectedLanguage)
-                .background(codePreviewBackground)
-                .frame(maxHeight: 200)
+            ZStack {
+                if exportOutput.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "doc.text")
+                            .font(.system(size: 32))
+                            .foregroundColor(.gray.opacity(0.5))
+                        VStack(spacing: 8) {
+                            Text("No code generated")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            Text("Select a language to generate code")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxHeight: 250)
+                } else {
+                    SyntaxHighlighter(code: exportOutput, language: selectedLanguage)
+                        .frame(maxHeight: 250)
+                }
+            }
+            .background(codePreviewBackground)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+            )
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.gray.opacity(0.2))
+        )
         .padding(.horizontal, 20)
     }
     
     private var codePreviewBackground: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.customBackground)
-            .overlay(codePreviewBorder)
-    }
-    
-    private var codePreviewBorder: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+        RoundedRectangle(cornerRadius: 12)
+            .fill(Color(.windowBackgroundColor))
+            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
     
     private var actionButtonsSection: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 16) {
             Button("Cancel", action: onDismiss)
                 .buttonStyle(.bordered)
             
             Spacer()
             
             Button(action: onCopy) {
-                Label("Copy", systemImage: "doc.on.doc")
+                Label("Copy Code", systemImage: "doc.on.doc")
             }
             .buttonStyle(.bordered)
             .disabled(exportOutput.isEmpty)
@@ -157,7 +255,13 @@ struct ExportModalContent: View {
             .disabled(exportOutput.isEmpty)
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 16)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.windowBackgroundColor))
+                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: -2)
+        )
+        .padding(.horizontal, 20)
     }
     
     // MARK: - Computed Properties

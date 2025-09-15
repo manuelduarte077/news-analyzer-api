@@ -48,12 +48,8 @@ struct SyntaxHighlighter: View {
             return highlightTypeScript(attributedString)
         case .javascript:
             return highlightJavaScript(attributedString)
-        case .dart:
-            return highlightDart(attributedString)
         case .objectivec:
             return highlightObjectiveC(attributedString)
-        case .php:
-            return highlightPHP(attributedString)
         }
     }
     
@@ -197,22 +193,6 @@ struct SyntaxHighlighter: View {
         return result
     }
     
-    private func highlightDart(_ attributedString: AttributedString) -> AttributedString {
-        var result = attributedString
-        let keywords = ["import", "library", "class", "abstract", "interface", "mixin", "enum", "typedef", "extension", "part", "part of", "export", "show", "hide", "as", "if", "else", "for", "while", "do", "switch", "case", "default", "break", "continue", "return", "try", "catch", "finally", "throw", "rethrow", "assert", "const", "final", "static", "late", "required", "external", "factory", "get", "set", "operator", "this", "super", "new", "null", "true", "false", "async", "await", "sync", "yield", "yield*"]
-        
-        for keyword in keywords {
-            result = highlightPattern("\\b\(keyword)\\b", in: result, color: .purple, weight: .semibold)
-        }
-        
-        result = highlightPattern("\"[^\"]*\"", in: result, color: .green, weight: .regular)
-        result = highlightPattern("'[^']*'", in: result, color: .green, weight: .regular)
-        result = highlightPattern("//.*$", in: result, color: .gray, weight: .regular)
-        result = highlightPattern("/\\*[\\s\\S]*?\\*/", in: result, color: .gray, weight: .regular)
-        result = highlightPattern("\\b\\d+\\.?\\d*\\b", in: result, color: .orange, weight: .regular)
-        
-        return result
-    }
     
     private func highlightObjectiveC(_ attributedString: AttributedString) -> AttributedString {
         var result = attributedString
@@ -230,23 +210,6 @@ struct SyntaxHighlighter: View {
         return result
     }
     
-    private func highlightPHP(_ attributedString: AttributedString) -> AttributedString {
-        var result = attributedString
-        let keywords = ["<?php", "?>", "class", "interface", "trait", "namespace", "use", "as", "public", "private", "protected", "static", "final", "abstract", "const", "function", "if", "else", "elseif", "switch", "case", "default", "for", "foreach", "while", "do", "break", "continue", "return", "try", "catch", "finally", "throw", "new", "clone", "instanceof", "this", "self", "parent", "null", "true", "false", "and", "or", "xor", "not", "isset", "empty", "unset", "echo", "print", "die", "exit", "include", "require", "include_once", "require_once", "global", "static", "var", "array", "string", "int", "float", "bool", "object", "resource", "mixed", "callable", "iterable", "void", "never"]
-        
-        for keyword in keywords {
-            result = highlightPattern("\\b\(keyword)\\b", in: result, color: .purple, weight: .semibold)
-        }
-        
-        result = highlightPattern("\"[^\"]*\"", in: result, color: .green, weight: .regular)
-        result = highlightPattern("'[^']*'", in: result, color: .green, weight: .regular)
-        result = highlightPattern("//.*$", in: result, color: .gray, weight: .regular)
-        result = highlightPattern("/\\*[\\s\\S]*?\\*/", in: result, color: .gray, weight: .regular)
-        result = highlightPattern("#.*$", in: result, color: .gray, weight: .regular)
-        result = highlightPattern("\\b\\d+\\.?\\d*\\b", in: result, color: .orange, weight: .regular)
-        
-        return result
-    }
     
     // MARK: - Helper Function
     private func highlightPattern(_ pattern: String, in attributedString: AttributedString, color: Color, weight: Font.Weight) -> AttributedString {
