@@ -43,7 +43,7 @@ struct ExportOptionsView: View {
         .fileExporter(
             isPresented: $showSaveDialog,
             document: CodeDocument(content: exportOutput),
-            contentType: UTType.plainText,
+            contentType: getContentType(for: selectedLanguage),
             defaultFilename: "\(exportFileName).\(selectedLanguage.fileExtension)"
         ) { result in
             handleSaveResult(result)
@@ -74,6 +74,29 @@ struct ExportOptionsView: View {
             print("Error saving file: \(error.localizedDescription)")
             saveErrorMessage = error.localizedDescription
             showSaveError = true
+        }
+    }
+    
+    private func getContentType(for language: ExportLanguage) -> UTType {
+        switch language {
+        case .swift:
+            return UTType(filenameExtension: "swift") ?? UTType.plainText
+        case .kotlin:
+            return UTType(filenameExtension: "kt") ?? UTType.plainText
+        case .java:
+            return UTType(filenameExtension: "java") ?? UTType.plainText
+        case .csharp:
+            return UTType(filenameExtension: "cs") ?? UTType.plainText
+        case .typescript:
+            return UTType(filenameExtension: "ts") ?? UTType.plainText
+        case .javascript:
+            return UTType(filenameExtension: "js") ?? UTType.plainText
+        case .dart:
+            return UTType(filenameExtension: "dart") ?? UTType.plainText
+        case .objectivec:
+            return UTType(filenameExtension: "h") ?? UTType.plainText
+        case .php:
+            return UTType(filenameExtension: "php") ?? UTType.plainText
         }
     }
 }
