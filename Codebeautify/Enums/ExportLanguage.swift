@@ -13,10 +13,8 @@ enum ExportLanguage: String, CaseIterable {
     case csharp = "C#"
     case swift = "Swift"
     case objectivec = "Objective-C"
-    case dart = "Dart"
     case typescript = "TypeScript"
     case javascript = "JavaScript"
-    case php = "PHP"
     
     var fileExtension: String {
         switch self {
@@ -25,10 +23,8 @@ enum ExportLanguage: String, CaseIterable {
         case .csharp: return "cs"
         case .swift: return "swift"
         case .objectivec: return "h"
-        case .dart: return "dart"
         case .typescript: return "ts"
         case .javascript: return "js"
-        case .php: return "php"
         }
     }
     
@@ -39,10 +35,8 @@ enum ExportLanguage: String, CaseIterable {
         case .csharp: return "c.circle"
         case .swift: return "swift"
         case .objectivec: return "o.circle"
-        case .dart: return "d.circle"
         case .typescript: return "t.circle"
         case .javascript: return "j.circle"
-        case .php: return "p.circle"
         }
     }
 }

@@ -24,12 +24,8 @@ struct CodeGenerator {
             return generateTypeScriptCode(json: json, className: className)
         case .javascript:
             return generateJavaScriptCode(json: json, className: className)
-        case .dart:
-            return generateDartCode(json: json, className: className)
         case .objectivec:
             return generateObjectiveCCode(json: json, className: className)
-        case .php:
-            return generatePHPCode(json: json, className: className)
         }
     }
     
@@ -168,26 +164,6 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - Dart Code Generation
-    private static func generateDartCode(json: Any, className: String) -> String {
-        var code = "class \(className) {\n"
-        
-        if let dict = json as? [String: Any] {
-            for (key, value) in dict {
-                let propertyName = toCamelCase(key)
-                let type = getDartType(value, key: key)
-                code += "    final \(type) \(propertyName);\n"
-            }
-            
-            code += "\n    \(className)({"
-            let params = dict.keys.map { "required this.\(toCamelCase($0))" }.joined(separator: ", ")
-            code += params
-            code += "});\n"
-        }
-        
-        code += "}"
-        return code
-    }
     
     // MARK: - Objective-C Code Generation
     private static func generateObjectiveCCode(json: Any, className: String) -> String {
@@ -206,29 +182,6 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - PHP Code Generation
-    private static func generatePHPCode(json: Any, className: String) -> String {
-        var code = "<?php\n\n"
-        code += "class \(className) {\n"
-        
-        if let dict = json as? [String: Any] {
-            for (key, value) in dict {
-                let propertyName = toCamelCase(key)
-                let type = getPHPType(value, key: key)
-                code += "    public \(type) $\(propertyName);\n"
-            }
-            
-            code += "\n    public function __construct($data) {\n"
-            for (key, _) in dict {
-                let propertyName = toCamelCase(key)
-                code += "        $this->\(propertyName) = $data['\(key)'] ?? null;\n"
-            }
-            code += "    }\n"
-        }
-        
-        code += "}"
-        return code
-    }
     
     // MARK: - Helper Functions
     private static func toCamelCase(_ text: String) -> String {
@@ -390,28 +343,6 @@ struct CodeGenerator {
         }
     }
     
-    private static func getDartType(_ value: Any, key: String) -> String {
-        switch value {
-        case is String: return "String"
-        case is Int: return "int"
-        case is Double: return "double"
-        case is Bool: return "bool"
-        case is [Any]:
-            if let array = value as? [Any], !array.isEmpty {
-                let elementType = getDartType(array.first!, key: key)
-                return "List<\(elementType)>"
-            }
-            return "List<String>" // Default to String list
-        case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return className
-            }
-            return "Map<String, String>"
-        case is NSNull: return "String?" // Nullable String for null values
-        default: return "String" // Default to String for unknown types
-        }
-    }
     
     private static func getObjectiveCType(_ value: Any, key: String) -> String {
         switch value {
@@ -436,26 +367,4 @@ struct CodeGenerator {
         }
     }
     
-    private static func getPHPType(_ value: Any, key: String) -> String {
-        switch value {
-        case is String: return "string"
-        case is Int: return "int"
-        case is Double: return "float"
-        case is Bool: return "bool"
-        case is [Any]:
-            if let array = value as? [Any], !array.isEmpty {
-                let elementType = getPHPType(array.first!, key: key)
-                return "array<\(elementType)>"
-            }
-            return "array<string>" // Default to string array
-        case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return className
-            }
-            return "array<string, string>"
-        case is NSNull: return "?string" // Nullable string for null values
-        default: return "string" // Default to string for unknown types
-        }
-    }
 }

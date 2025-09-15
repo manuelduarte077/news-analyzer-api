@@ -91,12 +91,8 @@ struct ExportOptionsView: View {
             return UTType(filenameExtension: "ts") ?? UTType.plainText
         case .javascript:
             return UTType(filenameExtension: "js") ?? UTType.plainText
-        case .dart:
-            return UTType(filenameExtension: "dart") ?? UTType.plainText
         case .objectivec:
             return UTType(filenameExtension: "h") ?? UTType.plainText
-        case .php:
-            return UTType(filenameExtension: "php") ?? UTType.plainText
         }
     }
 }
