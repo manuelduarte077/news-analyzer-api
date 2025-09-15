@@ -41,7 +41,7 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getSwiftType(value)
+                let type = getSwiftType(value, key: key)
                 code += "    let \(propertyName): \(type)\n"
             }
         }
@@ -58,7 +58,7 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             let properties = dict.map { (key, value) in
                 let propertyName = toCamelCase(key)
-                let type = getKotlinType(value)
+                let type = getKotlinType(value, key: key)
                 return "    @SerializedName(\"\(key)\")\n    val \(propertyName): \(type)"
             }
             code += properties.joined(separator: ",\n")
@@ -76,7 +76,7 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getJavaType(value)
+                let type = getJavaType(value, key: key)
                 code += "    @SerializedName(\"\(key)\")\n"
                 code += "    private \(type) \(propertyName);\n\n"
             }
@@ -84,7 +84,7 @@ struct CodeGenerator {
             // Getters and Setters
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getJavaType(value)
+                let type = getJavaType(value, key: key)
                 let capitalizedName = propertyName.prefix(1).uppercased() + propertyName.dropFirst()
                 
                 code += "    public \(type) get\(capitalizedName)() {\n"
@@ -125,7 +125,7 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getCSharpType(value)
+                let type = getCSharpType(value, key: key)
                 code += "    [JsonProperty(\"\(key)\")]\n"
                 code += "    public \(type) \(propertyName) { get; set; }\n\n"
             }
@@ -175,7 +175,7 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getDartType(value)
+                let type = getDartType(value, key: key)
                 code += "    final \(type) \(propertyName);\n"
             }
             
@@ -197,8 +197,8 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                let type = getObjectiveCType(value)
-                code += "@property (nonatomic, strong) \(type) *\(propertyName);\n"
+                let type = getObjectiveCType(value, key: key)
+                code += "@property (nonatomic, strong) \(type)\(propertyName);\n"
             }
         }
         
@@ -214,8 +214,8 @@ struct CodeGenerator {
         if let dict = json as? [String: Any] {
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
-                _ = getPHPType(value)
-                code += "    public $\(propertyName);\n"
+                let type = getPHPType(value, key: key)
+                code += "    public \(type) $\(propertyName);\n"
             }
             
             code += "\n    public function __construct($data) {\n"
@@ -238,39 +238,72 @@ struct CodeGenerator {
     }
     
     // MARK: - Type Helpers
-    private static func getSwiftType(_ value: Any) -> String {
+    private static func getSwiftType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "String"
         case is Int: return "Int"
         case is Double: return "Double"
         case is Bool: return "Bool"
-        case is [Any]: return "[Any]"
-        case is [String: Any]: return "[String: Any]"
-        default: return "Any"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getSwiftType(array.first!, key: key)
+                return "[\(elementType)]"
+            }
+            return "[String]" // Default to String array
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return className
+            }
+            return "Data"
+        case is NSNull: return "String?" // Optional String for null values
+        default: return "String" // Default to String for unknown types
         }
     }
     
-    private static func getKotlinType(_ value: Any) -> String {
+    private static func getKotlinType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "String"
         case is Int: return "Int"
         case is Double: return "Double"
         case is Bool: return "Boolean"
-        case is [Any]: return "List<Any>"
-        case is [String: Any]: return "Map<String, Any>"
-        default: return "Any"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getKotlinType(array.first!, key: key)
+                return "List<\(elementType)>"
+            }
+            return "List<String>" // Default to String list
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return className
+            }
+            return "Map<String, String>"
+        case is NSNull: return "String?" // Nullable String for null values
+        default: return "String" // Default to String for unknown types
         }
     }
     
-    private static func getJavaType(_ value: Any) -> String {
+    private static func getJavaType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "String"
         case is Int: return "Integer"
         case is Double: return "Double"
         case is Bool: return "Boolean"
-        case is [Any]: return "List<Object>"
-        case is [String: Any]: return "Map<String, Object>"
-        default: return "Object"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getJavaType(array.first!, key: key)
+                return "List<\(elementType)>"
+            }
+            return "List<String>" // Default to String list
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return className
+            }
+            return "Map<String, String>"
+        case is NSNull: return "String" // String for null values (Java doesn't have nullable primitives)
+        default: return "String" // Default to String for unknown types
         }
     }
     
@@ -334,51 +367,95 @@ struct CodeGenerator {
         }
     }
     
-    private static func getCSharpType(_ value: Any) -> String {
+    private static func getCSharpType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "string"
         case is Int: return "int"
         case is Double: return "double"
         case is Bool: return "bool"
-        case is [Any]: return "List<object>"
-        case is [String: Any]: return "Dictionary<string, object>"
-        default: return "object"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getCSharpType(array.first!, key: key)
+                return "List<\(elementType)>"
+            }
+            return "List<string>" // Default to string list
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return className
+            }
+            return "Dictionary<string, string>"
+        case is NSNull: return "string?" // Nullable string for null values
+        default: return "string" // Default to string for unknown types
         }
     }
     
-    private static func getDartType(_ value: Any) -> String {
+    private static func getDartType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "String"
         case is Int: return "int"
         case is Double: return "double"
         case is Bool: return "bool"
-        case is [Any]: return "List<dynamic>"
-        case is [String: Any]: return "Map<String, dynamic>"
-        default: return "dynamic"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getDartType(array.first!, key: key)
+                return "List<\(elementType)>"
+            }
+            return "List<String>" // Default to String list
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return className
+            }
+            return "Map<String, String>"
+        case is NSNull: return "String?" // Nullable String for null values
+        default: return "String" // Default to String for unknown types
         }
     }
     
-    private static func getObjectiveCType(_ value: Any) -> String {
+    private static func getObjectiveCType(_ value: Any, key: String) -> String {
         switch value {
-        case is String: return "NSString"
-        case is Int: return "NSNumber"
-        case is Double: return "NSNumber"
-        case is Bool: return "NSNumber"
-        case is [Any]: return "NSArray"
-        case is [String: Any]: return "NSDictionary"
-        default: return "id"
+        case is String: return "NSString *"
+        case is Int: return "NSNumber *"
+        case is Double: return "NSNumber *"
+        case is Bool: return "NSNumber *"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getObjectiveCType(array.first!, key: key)
+                return "NSArray<\(elementType)> *"
+            }
+            return "NSArray<NSString *> *" // Default to NSString array
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return "\(className) *"
+            }
+            return "NSDictionary<NSString *, NSString *> *"
+        case is NSNull: return "NSString *" // NSString for null values
+        default: return "NSString *" // Default to NSString for unknown types
         }
     }
     
-    private static func getPHPType(_ value: Any) -> String {
+    private static func getPHPType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "string"
         case is Int: return "int"
         case is Double: return "float"
         case is Bool: return "bool"
-        case is [Any]: return "array"
-        case is [String: Any]: return "array"
-        default: return "mixed"
+        case is [Any]:
+            if let array = value as? [Any], !array.isEmpty {
+                let elementType = getPHPType(array.first!, key: key)
+                return "array<\(elementType)>"
+            }
+            return "array<string>" // Default to string array
+        case is [String: Any]:
+            if let dict = value as? [String: Any] {
+                let className = key.capitalized + "Data"
+                return className
+            }
+            return "array<string, string>"
+        case is NSNull: return "?string" // Nullable string for null values
+        default: return "string" // Default to string for unknown types
         }
     }
 }
