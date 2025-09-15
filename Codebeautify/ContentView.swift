@@ -7,10 +7,12 @@
 
 import SwiftUI
 import Foundation
+import FirebaseCore
 
 // MARK: - Main View
 struct ContentView: View {
     @State private var selectedTool: ToolType?
+
     var body: some View {
         NavigationSplitView {
             // Sidebar

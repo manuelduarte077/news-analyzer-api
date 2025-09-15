@@ -9,7 +9,7 @@ import Foundation
 
 struct CodeGenerator {
     
-    // MARK: - Main Code Generation Logic
+    
     static func generateCodeForLanguage(json: Any, language: ExportLanguage, className: String) -> String {
         switch language {
         case .swift:
@@ -29,7 +29,7 @@ struct CodeGenerator {
         }
     }
     
-    // MARK: - Swift Code Generation
+    
     private static func generateSwiftCode(json: Any, className: String) -> String {
         var code = "import Foundation\n\n"
         code += "struct \(className): Codable {\n"
@@ -46,7 +46,7 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - Kotlin Code Generation
+    
     private static func generateKotlinCode(json: Any, className: String) -> String {
         var code = "import com.google.gson.annotations.SerializedName\n\n"
         code += "data class \(className)(\n"
@@ -64,7 +64,7 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - Java Code Generation
+    
     private static func generateJavaCode(json: Any, className: String) -> String {
         var code = "import com.google.gson.annotations.SerializedName;\n\n"
         code += "public class \(className) {\n"
@@ -77,7 +77,7 @@ struct CodeGenerator {
                 code += "    private \(type) \(propertyName);\n\n"
             }
             
-            // Getters and Setters
+            
             for (key, value) in dict {
                 let propertyName = toCamelCase(key)
                 let type = getJavaType(value, key: key)
@@ -97,7 +97,7 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - TypeScript Code Generation
+    
     private static func generateTypeScriptCode(json: Any, className: String) -> String {
         var code = "export interface \(className) {\n"
         
@@ -113,7 +113,7 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - C# Code Generation
+    
     private static func generateCSharpCode(json: Any, className: String) -> String {
         var code = "using System;\nusing Newtonsoft.Json;\n\n"
         code += "public class \(className)\n{\n"
@@ -131,7 +131,7 @@ struct CodeGenerator {
         return code
     }
     
-    // MARK: - JavaScript Code Generation
+    
     private static func generateJavaScriptCode(json: Any, className: String) -> String {
         var code = "/**\n"
         code += " * @typedef {Object} \(className)\n"
@@ -165,7 +165,7 @@ struct CodeGenerator {
     }
     
     
-    // MARK: - Objective-C Code Generation
+    
     private static func generateObjectiveCCode(json: Any, className: String) -> String {
         var code = "#import <Foundation/Foundation.h>\n\n"
         code += "@interface \(className) : NSObject\n"
@@ -183,14 +183,14 @@ struct CodeGenerator {
     }
     
     
-    // MARK: - Helper Functions
+    
     private static func toCamelCase(_ text: String) -> String {
         let words = text.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
         guard !words.isEmpty else { return text }
         return words[0].lowercased() + words.dropFirst().map { $0.capitalized }.joined()
     }
     
-    // MARK: - Type Helpers
+    
     private static func getSwiftType(_ value: Any, key: String) -> String {
         switch value {
         case is String: return "String"
@@ -202,15 +202,12 @@ struct CodeGenerator {
                 let elementType = getSwiftType(array.first!, key: key)
                 return "[\(elementType)]"
             }
-            return "[String]" // Default to String array
+            return "[String]" 
         case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return className
-            }
-            return "Data"
-        case is NSNull: return "String?" // Optional String for null values
-        default: return "String" // Default to String for unknown types
+            let className = key.capitalized + "Data"
+            return className
+        case is NSNull: return "String?" 
+        default: return "String" 
         }
     }
     
@@ -225,15 +222,12 @@ struct CodeGenerator {
                 let elementType = getKotlinType(array.first!, key: key)
                 return "List<\(elementType)>"
             }
-            return "List<String>" // Default to String list
+            return "List<String>" 
         case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return className
-            }
-            return "Map<String, String>"
-        case is NSNull: return "String?" // Nullable String for null values
-        default: return "String" // Default to String for unknown types
+            let className = key.capitalized + "Data"
+            return className
+        case is NSNull: return "String?" 
+        default: return "String" 
         }
     }
     
@@ -248,15 +242,12 @@ struct CodeGenerator {
                 let elementType = getJavaType(array.first!, key: key)
                 return "List<\(elementType)>"
             }
-            return "List<String>" // Default to String list
+            return "List<String>" 
         case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return className
-            }
-            return "Map<String, String>"
-        case is NSNull: return "String" // String for null values (Java doesn't have nullable primitives)
-        default: return "String" // Default to String for unknown types
+            let className = key.capitalized + "Data"
+            return className
+        case is NSNull: return "String" 
+        default: return "String" 
         }
     }
     
@@ -331,15 +322,12 @@ struct CodeGenerator {
                 let elementType = getCSharpType(array.first!, key: key)
                 return "List<\(elementType)>"
             }
-            return "List<string>" // Default to string list
+            return "List<string>" 
         case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return className
-            }
-            return "Dictionary<string, string>"
-        case is NSNull: return "string?" // Nullable string for null values
-        default: return "string" // Default to string for unknown types
+            let className = key.capitalized + "Data"
+            return className
+        case is NSNull: return "string?" 
+        default: return "string" 
         }
     }
     
@@ -355,15 +343,12 @@ struct CodeGenerator {
                 let elementType = getObjectiveCType(array.first!, key: key)
                 return "NSArray<\(elementType)> *"
             }
-            return "NSArray<NSString *> *" // Default to NSString array
+            return "NSArray<NSString *> *" 
         case is [String: Any]:
-            if let dict = value as? [String: Any] {
-                let className = key.capitalized + "Data"
-                return "\(className) *"
-            }
-            return "NSDictionary<NSString *, NSString *> *"
-        case is NSNull: return "NSString *" // NSString for null values
-        default: return "NSString *" // Default to NSString for unknown types
+            let className = key.capitalized + "Data"
+            return "\(className) *"
+        case is NSNull: return "NSString *" 
+        default: return "NSString *" 
         }
     }
     
