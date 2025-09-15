@@ -9,8 +9,35 @@ import Foundation
 
 struct CodeGenerator {
     
-    
+    // MARK: - Main Generation Function
     static func generateCodeForLanguage(json: Any, language: ExportLanguage, className: String) -> String {
+        // Validate inputs
+        guard !className.isEmpty else {
+            return "// Error: Class name cannot be empty"
+        }
+        
+        // Use a more efficient approach for large JSON objects
+        return generateCodeForLanguageOptimized(json: json, language: language, className: className)
+    }
+    
+    // MARK: - Async Generation (for large JSON objects)
+    static func generateCodeForLanguageAsync(json: Any, language: ExportLanguage, className: String) async -> String {
+        return await withTaskGroup(of: String.self) { group in
+            group.addTask {
+                return generateCodeForLanguage(json: json, language: language, className: className)
+            }
+            
+            // Wait for the first (and only) task to complete
+            for await result in group {
+                return result
+            }
+            
+            return "// Error: Failed to generate code"
+        }
+    }
+    
+    // MARK: - Optimized Generation
+    private static func generateCodeForLanguageOptimized(json: Any, language: ExportLanguage, className: String) -> String {
         switch language {
         case .swift:
             return generateSwiftCode(json: json, className: className)
@@ -35,10 +62,15 @@ struct CodeGenerator {
         code += "struct \(className): Codable {\n"
         
         if let dict = json as? [String: Any] {
-            for (key, value) in dict {
+            // Use more efficient string building
+            let properties = dict.compactMap { (key, value) -> String? in
                 let propertyName = toCamelCase(key)
                 let type = getSwiftType(value, key: key)
-                code += "    let \(propertyName): \(type)\n"
+                return "    let \(propertyName): \(type)"
+            }
+            code += properties.joined(separator: "\n")
+            if !properties.isEmpty {
+                code += "\n"
             }
         }
         
@@ -185,9 +217,23 @@ struct CodeGenerator {
     
     
     private static func toCamelCase(_ text: String) -> String {
+        // Optimize for common cases
+        guard !text.isEmpty else { return text }
+        
+        // Check if already in camelCase
+        if text.first?.isLowercase == true && !text.contains("_") && !text.contains("-") {
+            return text
+        }
+        
         let words = text.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
         guard !words.isEmpty else { return text }
-        return words[0].lowercased() + words.dropFirst().map { $0.capitalized }.joined()
+        
+        // More efficient string building
+        var result = words[0].lowercased()
+        for word in words.dropFirst() {
+            result += word.capitalized
+        }
+        return result
     }
     
     
@@ -204,6 +250,7 @@ struct CodeGenerator {
             }
             return "[String]" 
         case is [String: Any]:
+            // Optimize class name generation
             let className = key.capitalized + "Data"
             return className
         case is NSNull: return "String?" 

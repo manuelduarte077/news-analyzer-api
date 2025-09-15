@@ -25,6 +25,7 @@ struct ExportOptionsView: View {
             selectedLanguage: $selectedLanguage,
             exportOutput: $exportOutput,
             exportFileName: $exportFileName,
+            jsonData: jsonData,
             onCopy: copyExport,
             onSave: { showSaveDialog = true },
             onDismiss: { dismiss() },
@@ -57,7 +58,23 @@ struct ExportOptionsView: View {
             return
         }
         
-        exportOutput = CodeGenerator.generateCodeForLanguage(json: json, language: selectedLanguage, className: exportFileName)
+        // Check if JSON is large and should use async generation
+        let jsonString = String(data: data, encoding: .utf8) ?? ""
+        if jsonString.count > 10000 { // Large JSON threshold
+            Task {
+                let generatedCode = await CodeGenerator.generateCodeForLanguageAsync(
+                    json: json, 
+                    language: selectedLanguage, 
+                    className: exportFileName
+                )
+                await MainActor.run {
+                    exportOutput = generatedCode
+                }
+            }
+        } else {
+            // Use synchronous generation for small JSON
+            exportOutput = CodeGenerator.generateCodeForLanguage(json: json, language: selectedLanguage, className: exportFileName)
+        }
     }
     
     private func copyExport() {

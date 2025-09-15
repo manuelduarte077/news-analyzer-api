@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C4E6A4D82E78CD2E00AAA64D /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = C4E6A4D72E78CD2E00AAA64D /* FirebaseAI */; };
+		C4E6A4E32E78D02C00AAA64D /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C4E6A4E22E78D02C00AAA64D /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4E6A4E32E78D02C00AAA64D /* FirebaseCore in Frameworks */,
 				C4E6A4D82E78CD2E00AAA64D /* FirebaseAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -38,6 +40,7 @@
 			isa = PBXGroup;
 			children = (
 				C480D5212E7157A00093B26A /* Codebeautify */,
+				C4E6A4E12E78D02C00AAA64D /* Frameworks */,
 				C480D5202E7157A00093B26A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +51,13 @@
 				C480D51F2E7157A00093B26A /* Codebeautify.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C4E6A4E12E78D02C00AAA64D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,6 +81,7 @@
 			name = Codebeautify;
 			packageProductDependencies = (
 				C4E6A4D72E78CD2E00AAA64D /* FirebaseAI */,
+				C4E6A4E22E78D02C00AAA64D /* FirebaseCore */,
 			);
 			productName = Codebeautify;
 			productReference = C480D51F2E7157A00093B26A /* Codebeautify.app */;
@@ -284,11 +295,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -327,11 +337,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -375,6 +384,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C4E6A4D62E78CD2E00AAA64D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAI;
+		};
+		C4E6A4E22E78D02C00AAA64D /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4E6A4D62E78CD2E00AAA64D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
