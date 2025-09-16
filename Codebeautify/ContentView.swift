@@ -7,26 +7,125 @@
 
 import SwiftUI
 import Foundation
-import FirebaseCore
 
-// MARK: - Main View
 struct ContentView: View {
-    @State private var selectedTool: ToolType?
-
+    @State private var inputJSON: String = ""
+    @State private var selectedLanguage: ExportLanguage = .swift
+    @State private var className: String = "GeneratedModel"
+    @State private var generatedCode: String = ""
+    @State private var showExportOptions = false
+    @State private var showCopiedAlert = false
+    @State private var isGenerating = false
+    @State private var showError = false
+    @State private var errorMessage = ""
+    
     var body: some View {
         NavigationSplitView {
             // Sidebar
             VStack(spacing: 0) {
-                // Tools List
-                List(ToolType.allCases, id: \.self, selection: $selectedTool) { tool in
-                    Label(tool.rawValue, systemImage: tool.icon)
-                        .tag(tool as ToolType?)
+                // Header
+                VStack(spacing: 16) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 40))
+                        .foregroundColor(.purple)
+                    
+                    Text("Codebeautify")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    Text("AI-Powered Code Generator")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
-                .navigationTitle("Codebeautify")
+                .padding(.top, 20)
+                .padding(.bottom, 16)
                 
                 Divider()
                 
-                // Developer Info Section
+                // Language Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Programming Language")
+                        .font(.headline)
+                        .padding(.horizontal, 20)
+                    
+                    Picker("Language", selection: $selectedLanguage) {
+                        ForEach(ExportLanguage.allCases, id: \.self) { language in
+                            Label(language.rawValue, systemImage: language.icon)
+                                .tag(language)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .padding(.horizontal, 20)
+                    .onChange(of: selectedLanguage) { _, _ in
+                        generateCodeWithAI()
+                    }
+                }
+                .padding(.vertical, 16)
+                
+                Divider()
+                
+                // Class Name Input
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Class Name")
+                        .font(.headline)
+                        .padding(.horizontal, 20)
+                    
+                    TextField("Enter class name", text: $className)
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.horizontal, 20)
+                        .onChange(of: className) { _, _ in
+                            generateCodeWithAI()
+                        }
+                }
+                .padding(.vertical, 16)
+                
+                Divider()
+                
+                // AI Features Section
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text("AI-Powered Features")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "sparkles")
+                            .foregroundColor(.purple)
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    VStack(spacing: 12) {
+                        Button(action: generateCodeWithAI) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "sparkles")
+                                Text("Generate with AI")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.purple.opacity(0.1))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                            .foregroundColor(.purple)
+                            .fontWeight(.medium)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(inputJSON.isEmpty || isGenerating)
+                        
+                        
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.vertical, 16)
+                
+                Spacer()
+                
+                // Developer Info
                 VStack(spacing: 12) {
                     HStack(spacing: 12) {
                         ZStack {
@@ -48,365 +147,235 @@ struct ContentView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.bottom, 20)
+            }
+            .frame(minWidth: 280)
+            .background(Color(.controlBackgroundColor))
+            
+        } detail: {
+            // Main Content
+            VStack(spacing: 0) {
+                // Input Section
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text("JSON Input")
+                            .font(.headline)
                         
                         Spacer()
+                        
+                        Button("Clear") {
+                            inputJSON = ""
+                            generatedCode = ""
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(inputJSON.isEmpty)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                     
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "envelope.fill")
-                                .font(.caption)
-                                .foregroundColor(.blue)
-                                .frame(width: 12)
-                            Text("dev@donmanuel.com")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                    TextEditor(text: $inputJSON)
+                        .font(.system(.body, design: .monospaced))
+                        .padding(12)
+                        .background(Color(.textBackgroundColor))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 20)
+                        .onChange(of: inputJSON) { _, _ in
+                            // Auto-generate when JSON changes
+                            if !inputJSON.isEmpty && !className.isEmpty {
+                                generateCodeWithAI()
+                            }
+                        }
+                }
+                .frame(maxHeight: 300)
+                
+                Divider()
+                
+                // Output Section
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 8) {
+                                Text("AI Generated Code")
+                                    .font(.headline)
+                                
+                                Image(systemName: "sparkles")
+                                    .foregroundColor(.purple)
+                                    .font(.caption)
+                            }
+                            
+                            if isGenerating {
+                                HStack(spacing: 8) {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                    Text("Generating with AI...")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            } else {
+                                Text("\(selectedLanguage.rawValue) • \(generatedCode.components(separatedBy: .newlines).count) lines")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
-                        HStack(spacing: 8) {
-                            Image(systemName: "globe")
-                                .font(.caption)
-                                .foregroundColor(.green)
-                                .frame(width: 12)
-                            Text("donmanuel.dev")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        Spacer()
                         
                         HStack(spacing: 8) {
-                            Image(systemName: "app.badge")
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                                .frame(width: 12)
-                            Text("Version 1.0")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            Button("Copy") {
+                                copyCode()
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(generatedCode.isEmpty)
+                            
+                            Button("Export") {
+                                showExportOptions = true
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(generatedCode.isEmpty)
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    
+                    if generatedCode.isEmpty && !isGenerating {
+                        VStack(spacing: 16) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 32))
+                                .foregroundColor(.purple.opacity(0.5))
+                            VStack(spacing: 8) {
+                                Text("No AI code generated")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Text("Enter JSON to generate code with AI")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        SyntaxHighlighter(code: generatedCode, language: selectedLanguage)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 }
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.customSecondaryBackground)
-                        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-                )
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
-            }
-            .navigationSplitViewColumnWidth(min: 200, ideal: 250)
-        } detail: {
-            // Detail view
-            if let tool = selectedTool {
-                ToolDetailView(selectedTool: tool)
-                    .id(tool)
-            } else {
-                Text("Select a tool")
-                    .font(.largeTitle)
-                    .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .navigationSplitViewStyle(.balanced)
-    }
-}
-
-//MARK: - Detail view
-struct ToolDetailView: View {
-    let selectedTool: ToolType
-    @AppStorage("viewMode") private var viewMode: ViewMode = .text
-    @State private var inputText: String = ""
-    @State private var outputText: String = ""
-    @State private var showError: Bool = false
-    @State private var errorMessage: String = ""
-    @State private var jsonNodes: [JSONNode] = []
-    @State private var showCopiedAlert: Bool = false
-    @State private var selectedExportLanguage: ExportLanguage = .swift
-    @State private var showExportOptions: Bool = false
-    @State private var exportOutput: String = ""
-    @State private var exportFileName: String = "GeneratedModel"
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Toolbar
-            VStack(spacing: 12) {
-                HStack {
-                    Text(selectedTool.rawValue)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Spacer()
-                    
-                    // Mode Picker
-                    if selectedTool == .jsonFormatter {
-                        Picker("View Mode", selection: $viewMode) {
-                            ForEach(ViewMode.allCases, id: \.self) { mode in
-                                Text(mode.rawValue).tag(mode)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .frame(width: 200)
-                    }
-                }
-                
-                HStack {
-                    Button(action: onClickClear) {
-                        Label("Clear", systemImage: "trash")
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(inputText.isEmpty)
-                    
-                    Button(action: onClickCopy) {
-                        Label("Copy", systemImage: "doc.on.doc")
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(outputText.isEmpty)
-                    
-                    Spacer()
-                }
-            }
-            .padding()
-            .background(Color.customToolbarBackground)
-            
-            Divider()
-            
-            // Content area
-            if selectedTool == .jsonFormatter && viewMode == .tree && !jsonNodes.isEmpty {
-                // Tree view for JSON
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(jsonNodes) { node in
-                            JSONTreeNodeView(node: node, level: 0)
-                        }
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .background(Color.customBackground)
-            } else {
-                // Text-based view
-                GeometryReader { geometry in
-                    VStack(spacing: 0) {
-                        // Input
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Input")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.top, 8)
-                            
-                            TextEditor(text: $inputText)
-                                .font(.system(.body, design: .monospaced))
-                                .padding(4)
-                                .background(Color.customBackground)
-                                .cornerRadius(8)
-                                .padding(.horizontal)
-                                .onChange(of: inputText) { _, newValue in
-                                    // Save input to UserDefaults
-                                    UserDefaults.standard.set(newValue, forKey: selectedTool.storageKey)
-                                    processInput()
-                                }
-                        }
-                        .frame(height: geometry.size.height / 2)
-                        .background(Color.customSecondaryBackground)
-                        
-                        Divider()
-                        
-                        // Output
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("Output")
-                                    .font(.headline)
-                                
-                                Spacer()
-                                
-                                if selectedTool == .jsonFormatter && !outputText.isEmpty {
-                                    Button(action: { showExportOptions = true }) {
-                                        Label("Export", systemImage: "square.and.arrow.up")
-                                    }
-                                    .buttonStyle(.bordered)
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                            
-                            ScrollView {
-                                if isCodeOutput(outputText) {
-                                    SyntaxHighlighter(code: outputText, language: detectLanguage(outputText))
-                                } else {
-                                    Text(outputText)
-                                        .font(.system(.body, design: .monospaced))
-                                        .textSelection(.enabled)
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                                        .padding()
-                                }
-                            }
-                            .background(Color.customBackground)
-                            .cornerRadius(8)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                        }
-                        .frame(height: geometry.size.height / 2)
-                        .background(Color.customSecondaryBackground)
-                    }
-                }
-            }
+        .alert("Copied!", isPresented: $showCopiedAlert) {
+            Button("OK") { }
+        } message: {
+            Text("Code copied to clipboard")
         }
         .alert("Error", isPresented: $showError) {
             Button("OK") { }
         } message: {
             Text(errorMessage)
         }
-        .alert("Copied!", isPresented: $showCopiedAlert) {
-            Button("OK") { }
-        } message: {
-            Text("Output copied to clipboard")
-        }
         .sheet(isPresented: $showExportOptions) {
             ExportOptionsView(
-                selectedLanguage: $selectedExportLanguage,
-                exportOutput: $exportOutput,
-                exportFileName: $exportFileName,
-                jsonData: outputText
+                selectedLanguage: $selectedLanguage,
+                exportOutput: $generatedCode,
+                exportFileName: $className,
+                jsonData: inputJSON
             )
         }
         .onAppear {
-            // Load saved input from UserDefaults
-            inputText = UserDefaults.standard.string(forKey: selectedTool.storageKey) ?? ""
-            processInput()
+            loadSampleJSON()
         }
     }
     
-    // MARK: - Actions
-    func onClickClear() {
-        inputText = ""
-        outputText = ""
-        jsonNodes = []
-        UserDefaults.standard.removeObject(forKey: selectedTool.storageKey)
-    }
-    
-    func onClickCopy() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(outputText, forType: .string)
-        showCopiedAlert = true
-    }
-    
-    func processInput() {
-        guard !inputText.isEmpty else {
-            outputText = ""
-            jsonNodes = []
+    // MARK: - AI Actions
+    private func generateCodeWithAI() {
+        guard !inputJSON.isEmpty, !className.isEmpty else {
+            generatedCode = ""
             return
         }
         
-        switch selectedTool {
-        case .jsonFormatter:
-            formatJSON()
+        guard let data = inputJSON.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) else {
+            errorMessage = "Invalid JSON format"
+            showError = true
+            return
         }
-    }
-    
-    // MARK: - JSON Formatter
-    func formatJSON() {
-        do {
-            guard let data = inputText.data(using: .utf8) else {
-                throw NSError(domain: "Invalid input", code: 0)
+        
+        isGenerating = true
+        
+        Task {
+            do {
+                let firebaseManager = FirebaseManager.shared
+                let aiGeneratedCode = try await firebaseManager.generateCodeWithAI(
+                    jsonDescription: inputJSON,
+                    language: selectedLanguage.rawValue,
+                    className: className
+                )
+                
+                await MainActor.run {
+                    generatedCode = aiGeneratedCode
+                    isGenerating = false
+                }
+            } catch {
+                await MainActor.run {
+                    // Fallback to local generation
+                    generatedCode = generateFallbackCode(json: json)
+                    isGenerating = false
+                    
+                    errorMessage = "AI generation failed, using local generator: \(error.localizedDescription)"
+                    
+                    showError = true
+                }
             }
-            
-            let json = try JSONSerialization.jsonObject(with: data)
-            let prettyData = try JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted, .sortedKeys])
-            outputText = String(data: prettyData, encoding: .utf8) ?? ""
-            
-            // Parse for tree view
-            jsonNodes = parseJSONToNodes(json: json, key: nil)
-        } catch {
-            outputText = "Invalid JSON: \(error.localizedDescription)"
-            jsonNodes = []
         }
     }
     
-    func parseJSONToNodes(json: Any, key: String?) -> [JSONNode] {
-        if let dict = json as? [String: Any] {
-            let node = JSONNode(key: key, value: dict, type: .dictionary, children: dict.compactMap { k, v in
-                parseJSONToNodes(json: v, key: k).first
-            })
-            return [node]
-        } else if let array = json as? [Any] {
-            let node = JSONNode(key: key, value: array, type: .array, children: array.enumerated().compactMap { index, item in
-                parseJSONToNodes(json: item, key: "[\(index)]").first
-            })
-            return [node]
-        } else if let string = json as? String {
-            return [JSONNode(key: key, value: string, type: .string)]
-        } else if let number = json as? NSNumber {
-            if number.isBool {
-                return [JSONNode(key: key, value: number.boolValue, type: .boolean)]
-            } else {
-                return [JSONNode(key: key, value: number, type: .number)]
-            }
-        } else if json is NSNull {
-            return [JSONNode(key: key, value: "null", type: .null)]
-        }
-        return []
-        }
+    
+    private func generateFallbackCode(json: Any) -> String {
+        let fallbackCode = CodeGenerator.generateCodeForLanguage(
+            json: json,
+            language: selectedLanguage,
+            className: className
+        )
         
+        let fallbackMessage = """
+        // Generated using local method (AI unavailable)
+        // This code is fully functional and ready to use
+        //
+        
+        """
+        
+        return fallbackMessage + fallbackCode
     }
     
-    // MARK: - Code Detection
-    private func isCodeOutput(_ text: String) -> Bool {
-        // Check if the output looks like generated code
-        let codeIndicators = [
-            "import ", "class ", "struct ", "interface ", "function ", "public class",
-            "<?php", "using ", "namespace ", "export ", "interface ", "type ",
-            "data class", "object ", "enum ", "protocol ", "extension "
-        ]
-        
-        return codeIndicators.contains { text.contains($0) }
+    private func copyCode() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(generatedCode, forType: .string)
+        showCopiedAlert = true
     }
     
-    private func detectLanguage(_ text: String) -> ExportLanguage {
-        // Swift indicators
-        if text.contains("import Foundation") || text.contains("struct ") || text.contains(": Codable") {
-            return .swift
+    private func loadSampleJSON() {
+        inputJSON = """
+        {
+            "id": 1,
+            "name": "Sample User",
+            "email": "user@example.com",
+            "isActive": true,
+            "profile": {
+                "firstName": "John",
+                "lastName": "Doe",
+                "age": 30
+            },
+            "tags": ["developer", "swift", "ios"]
         }
-        
-        // Kotlin indicators
-        if text.contains("data class") || text.contains("import com.google.gson") {
-            return .kotlin
-        }
-        
-        // Java indicators
-        if text.contains("public class") && text.contains("import com.google.gson") {
-            return .java
-        }
-        
-        // C# indicators
-        if text.contains("using System") || text.contains("using Newtonsoft") {
-            return .csharp
-        }
-        
-        // TypeScript indicators
-        if text.contains("export interface") || text.contains(": string") || text.contains(": number") {
-            return .typescript
-        }
-        
-        // JavaScript indicators
-        if text.contains("class ") && text.contains("module.exports") {
-            return .javascript
-        }
-        
-        // Objective-C indicators
-        if text.contains("#import") && text.contains("@interface") {
-            return .objectivec
-        }
-        
-        // Default to Swift if no specific language detected
-        return .swift
+        """
+        // Auto-generate sample code
+        generateCodeWithAI()
     }
     
-    // MARK: - Extensions
-extension NSNumber {
-    var isBool: Bool {
-        CFBooleanGetTypeID() == CFGetTypeID(self)
-    }
 }
 
 // MARK: - Preview

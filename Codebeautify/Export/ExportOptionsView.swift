@@ -14,6 +14,7 @@ struct ExportOptionsView: View {
     @Binding var exportOutput: String
     @Binding var exportFileName: String
     let jsonData: String
+    
     @Environment(\.dismiss) private var dismiss
     @State private var showCopiedAlert = false
     @State private var showSaveDialog = false
@@ -21,16 +22,93 @@ struct ExportOptionsView: View {
     @State private var saveErrorMessage = ""
     
     var body: some View {
-        ExportModalContent(
-            selectedLanguage: $selectedLanguage,
-            exportOutput: $exportOutput,
-            exportFileName: $exportFileName,
-            jsonData: jsonData,
-            onCopy: copyExport,
-            onSave: { showSaveDialog = true },
-            onDismiss: { dismiss() },
-            onAppear: generateExport
-        )
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text("AI Generated Code")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                        
+                        Image(systemName: "sparkles")
+                            .foregroundColor(.purple)
+                            .font(.caption)
+                    }
+                    
+                    Text("\(selectedLanguage.rawValue) • \(exportOutput.components(separatedBy: .newlines).count) lines")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Button("Cancel") {
+                    dismiss()
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 16)
+            
+            Divider()
+            
+            // Content
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Code Preview
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Code Preview")
+                                .font(.headline)
+                            
+                            Spacer()
+                            
+                            Button("Copy") {
+                                copyCode()
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                        
+                        SyntaxHighlighter(code: exportOutput, language: selectedLanguage)
+                            .frame(maxHeight: 400)
+                            .background(Color(.textBackgroundColor))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.gray.opacity(0.1))
+                    )
+                    .padding(.horizontal, 20)
+                    
+                    // Action Buttons
+                    HStack(spacing: 16) {
+                        Button("Copy Code") {
+                            copyCode()
+                        }
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity)
+                        
+                        Button("Save to File") {
+                            showSaveDialog = true
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.vertical, 16)
+            }
+        }
+        .frame(width: 600, height: 500)
+        .background(Color(.windowBackgroundColor))
         .alert("Copied!", isPresented: $showCopiedAlert) {
             Button("OK") { }
         } message: {
@@ -51,47 +129,11 @@ struct ExportOptionsView: View {
         }
     }
     
-    private func generateExport() {
-        guard let data = jsonData.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: data) else {
-            exportOutput = "Invalid JSON data"
-            return
-        }
-        
-        // Check if JSON is large and should use async generation
-        let jsonString = String(data: data, encoding: .utf8) ?? ""
-        if jsonString.count > 10000 { // Large JSON threshold
-            Task {
-                let generatedCode = await CodeGenerator.generateCodeForLanguageAsync(
-                    json: json, 
-                    language: selectedLanguage, 
-                    className: exportFileName
-                )
-                await MainActor.run {
-                    exportOutput = generatedCode
-                }
-            }
-        } else {
-            // Use synchronous generation for small JSON
-            exportOutput = CodeGenerator.generateCodeForLanguage(json: json, language: selectedLanguage, className: exportFileName)
-        }
-    }
-    
-    private func copyExport() {
+    // MARK: - Actions
+    private func copyCode() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(exportOutput, forType: .string)
         showCopiedAlert = true
-    }
-    
-    private func handleSaveResult(_ result: Result<URL, Error>) {
-        switch result {
-        case .success(let url):
-            print("File saved successfully to: \(url)")
-        case .failure(let error):
-            print("Error saving file: \(error.localizedDescription)")
-            saveErrorMessage = error.localizedDescription
-            showSaveError = true
-        }
     }
     
     private func getContentType(for language: ExportLanguage) -> UTType {
@@ -112,4 +154,25 @@ struct ExportOptionsView: View {
             return UTType(filenameExtension: "h") ?? UTType.plainText
         }
     }
+    
+    private func handleSaveResult(_ result: Result<URL, Error>) {
+        switch result {
+        case .success(let url):
+            print("File saved successfully to: \(url)")
+        case .failure(let error):
+            print("Error saving file: \(error.localizedDescription)")
+            saveErrorMessage = error.localizedDescription
+            showSaveError = true
+        }
+    }
+}
+
+// MARK: - Preview
+#Preview {
+    ExportOptionsView(
+        selectedLanguage: .constant(.swift),
+        exportOutput: .constant("struct SampleModel: Codable {\n    let id: Int\n    let name: String\n}"),
+        exportFileName: .constant("SampleModel"),
+        jsonData: "{\"id\": 1, \"name\": \"Test\"}"
+    )
 }

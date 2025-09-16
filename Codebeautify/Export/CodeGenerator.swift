@@ -20,21 +20,6 @@ struct CodeGenerator {
         return generateCodeForLanguageOptimized(json: json, language: language, className: className)
     }
     
-    // MARK: - Async Generation (for large JSON objects)
-    static func generateCodeForLanguageAsync(json: Any, language: ExportLanguage, className: String) async -> String {
-        return await withTaskGroup(of: String.self) { group in
-            group.addTask {
-                return generateCodeForLanguage(json: json, language: language, className: className)
-            }
-            
-            // Wait for the first (and only) task to complete
-            for await result in group {
-                return result
-            }
-            
-            return "// Error: Failed to generate code"
-        }
-    }
     
     // MARK: - Optimized Generation
     private static func generateCodeForLanguageOptimized(json: Any, language: ExportLanguage, className: String) -> String {

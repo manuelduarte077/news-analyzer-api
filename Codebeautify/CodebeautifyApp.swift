@@ -12,8 +12,8 @@ import FirebaseCore
 struct CodebeautifyApp: App {
     
     init() {
-        // Firebase will be configured by FirebaseManager when needed
-        // This prevents duplicate configuration errors
+        // Configure Firebase
+        FirebaseApp.configure()
     }
     
     var body: some Scene {
