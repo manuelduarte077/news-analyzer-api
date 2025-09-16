@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import FirebaseCore
+import FirebaseAI
 import SwiftUI
 
 class FirebaseManager: ObservableObject {
@@ -14,18 +16,38 @@ class FirebaseManager: ObservableObject {
     private init() {}
     
     // MARK: - AI Services
-    func generateText(prompt: String) async throws -> String {
-        // For now, return a placeholder since Firebase AI is not working
-        // This will trigger the fallback to local generation
-        throw NSError(domain: "FirebaseAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase AI temporarily disabled"])
+    func getGenerativeModel() -> GenerativeModel? {
+        let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+        return ai.generativeModel(modelName: "gemini-2.5-flash")
     }
     
-    
+    func generateText(prompt: String) async throws -> String {
+        guard let model = getGenerativeModel() else {
+            throw NSError(domain: "FirebaseAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create generative model"])
+        }
+        
+        let response = try await model.generateContent(prompt)
+        return response.text ?? "No response generated"
+    }
     
     // MARK: - Code Generation with AI
     func generateCodeWithAI(jsonDescription: String, language: String, className: String) async throws -> String {
-        // Temporarily disabled - will use local generation
-        throw NSError(domain: "FirebaseAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "AI generation temporarily disabled"])
+        let prompt = """
+        Generate a \(language) class/struct named \(className) based on this JSON structure:
+        
+        \(jsonDescription)
+        
+        Requirements:
+        - Use proper \(language) syntax and conventions
+        - Include appropriate imports/dependencies
+        - Add proper type annotations
+        - Follow \(language) naming conventions
+        - Make it production-ready code
+        
+        Return only the code, no explanations.
+        """
+        
+        return try await generateText(prompt: prompt)
     }
     
 }
