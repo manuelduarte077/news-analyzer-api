@@ -33,7 +33,7 @@ struct ContentView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     
-                    Text("AI-Powered Code Generator")
+                    Text("Code Generator")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -84,34 +84,34 @@ struct ContentView: View {
                 // AI Features Section
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Text("AI-Powered Features")
+                        Text("Code Generation")
                             .font(.headline)
                             .foregroundColor(.primary)
                         
                         Spacer()
                         
-                        Image(systemName: "sparkles")
-                            .foregroundColor(.purple)
+                        Image(systemName: "gear")
+                            .foregroundColor(.blue)
                     }
                     .padding(.horizontal, 20)
                     
                     VStack(spacing: 12) {
                         Button(action: generateCodeWithAI) {
                             HStack(spacing: 8) {
-                                Image(systemName: "sparkles")
-                                Text("Generate with AI")
+                                Image(systemName: "gear")
+                                Text("Generate Code")
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.purple.opacity(0.1))
+                                    .fill(Color.blue.opacity(0.1))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+                                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
                                     )
                             )
-                            .foregroundColor(.purple)
+                            .foregroundColor(.blue)
                             .fontWeight(.medium)
                         }
                         .buttonStyle(.plain)
@@ -201,11 +201,11 @@ struct ContentView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 8) {
-                                Text("AI Generated Code")
+                                Text("Generated Code")
                                     .font(.headline)
                                 
-                                Image(systemName: "sparkles")
-                                    .foregroundColor(.purple)
+                                Image(systemName: "gear")
+                                    .foregroundColor(.blue)
                                     .font(.caption)
                             }
                             
@@ -245,14 +245,14 @@ struct ContentView: View {
                     
                     if generatedCode.isEmpty && !isGenerating {
                         VStack(spacing: 16) {
-                            Image(systemName: "sparkles")
+                            Image(systemName: "gear")
                                 .font(.system(size: 32))
-                                .foregroundColor(.purple.opacity(0.5))
+                                .foregroundColor(.blue.opacity(0.5))
                             VStack(spacing: 8) {
-                                Text("No AI code generated")
+                                Text("No code generated")
                                     .font(.headline)
                                     .foregroundColor(.primary)
-                                Text("Enter JSON to generate code with AI")
+                                Text("Enter JSON to generate code")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
@@ -325,7 +325,7 @@ struct ContentView: View {
                     generatedCode = generateFallbackCode(json: json)
                     isGenerating = false
                     
-                    errorMessage = "AI generation failed, using local generator: \(error.localizedDescription)"
+                    errorMessage = "Using local code generator (AI temporarily disabled)"
                     
                     showError = true
                 }

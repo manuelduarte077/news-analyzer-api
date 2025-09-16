@@ -6,15 +6,9 @@
 //
 
 import SwiftUI
-import FirebaseCore
 
 @main
 struct CodebeautifyApp: App {
-    
-    init() {
-        // Configure Firebase
-        FirebaseApp.configure()
-    }
     
     var body: some Scene {
         WindowGroup {
