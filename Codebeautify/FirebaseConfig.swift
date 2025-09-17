@@ -16,67 +16,10 @@ class FirebaseManager: ObservableObject {
     private init() {}
     
     // MARK: - AI Services
-    func getGenerativeModel() -> GenerativeModel? {
-        do {
-            let ai = FirebaseAI.firebaseAI(backend: .googleAI())
-            // Use the correct model name - gemini-1.5-flash is the current stable model
-            return ai.generativeModel(modelName: "gemini-1.5-flash")
-        } catch {
-            print("Error creating generative model: \(error)")
-            return nil
-        }
-    }
-    
-    func generateText(prompt: String) async throws -> String {
-        guard let model = getGenerativeModel() else {
-            throw NSError(domain: "FirebaseAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create generative model. Please check your Firebase configuration."])
-        }
-        
-        do {
-            print("Generating content with prompt: \(prompt.prefix(100))...")
-            let response = try await model.generateContent(prompt)
-            
-            guard let text = response.text, !text.isEmpty else {
-                throw NSError(domain: "FirebaseAI", code: -2, userInfo: [NSLocalizedDescriptionKey: "Empty response from AI. The model returned no content."])
-            }
-            
-            print("Successfully generated content: \(text.prefix(100))...")
-            return text
-        } catch let error as NSError {
-            print("Firebase AI Error: \(error)")
-            print("Error domain: \(error.domain)")
-            print("Error code: \(error.code)")
-            print("Error userInfo: \(error.userInfo)")
-            
-            // Provide more specific error messages based on the error
-            var errorMessage = "AI generation failed"
-            
-            if error.domain == "FirebaseAI.GenerateContentError" {
-                switch error.code {
-                case 0:
-                    errorMessage = "Firebase AI service unavailable. Please check your internet connection and Firebase configuration."
-                case 1:
-                    errorMessage = "Invalid request to Firebase AI. Please check your prompt format."
-                case 2:
-                    errorMessage = "Firebase AI quota exceeded. Please try again later."
-                case 3:
-                    errorMessage = "Firebase AI permission denied. Please check your API key and project configuration."
-                default:
-                    errorMessage = "Firebase AI error: \(error.localizedDescription)"
-                }
-            } else {
-                errorMessage = "AI generation failed: \(error.localizedDescription)"
-            }
-            
-            throw NSError(domain: "FirebaseAI", code: -3, userInfo: [
-                NSLocalizedDescriptionKey: errorMessage,
-                NSUnderlyingErrorKey: error
-            ])
-        }
-    }
-    
-    // MARK: - Code Generation with AI
     func generateCodeWithAI(jsonDescription: String, language: String, className: String) async throws -> String {
+        let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+        let model = ai.generativeModel(modelName: "gemini-2.0-flash")
+        
         let prompt = """
         Generate a \(language) class/struct named \(className) based on this JSON structure:
         
@@ -89,12 +32,17 @@ class FirebaseManager: ObservableObject {
         - Follow \(language) naming conventions
         - Make it production-ready code
         - Include proper documentation comments
+
         
-        Return only the code, no explanations or markdown formatting.
+        Return only the code, no explanations.
         """
         
         do {
-            return try await generateText(prompt: prompt)
+            let response = try await model.generateContent(prompt)
+            guard let text = response.text, !text.isEmpty else {
+                throw NSError(domain: "FirebaseAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Empty response from AI"])
+            }
+            return text
         } catch {
             // If AI generation fails, provide a fallback basic structure
             print("AI generation failed, using fallback: \(error)")

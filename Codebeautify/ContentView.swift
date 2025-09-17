@@ -58,7 +58,8 @@ struct ContentView: View {
                     .pickerStyle(.menu)
                     .padding(.horizontal, 20)
                     .onChange(of: selectedLanguage) { _, _ in
-                        generateCodeWithAI()
+                        generatedCode = ""
+                        isUsingFallback = false
                     }
                 }
                 .padding(.vertical, 16)
@@ -75,7 +76,9 @@ struct ContentView: View {
                         .textFieldStyle(.roundedBorder)
                         .padding(.horizontal, 20)
                         .onChange(of: className) { _, _ in
-                            generateCodeWithAI()
+                            // Clear generated code when class name changes
+                            generatedCode = ""
+                            isUsingFallback = false
                         }
                 }
                 .padding(.vertical, 16)
@@ -100,7 +103,7 @@ struct ContentView: View {
                         Button(action: generateCodeWithAI) {
                             HStack(spacing: 8) {
                                 Image(systemName: "sparkles")
-                                Text("Generate with AI")
+                                Text("Generar Modelo")
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -178,7 +181,7 @@ struct ContentView: View {
                     .padding(.top, 20)
                     
                     TextEditor(text: $inputJSON)
-                        .font(.system(size: 18, weight: .regular, design: .monospaced))
+                        .font(.system(size: 20, weight: .regular, design: .monospaced))
                         .padding(12)
                         .background(Color(.textBackgroundColor))
                         .overlay(
@@ -187,10 +190,9 @@ struct ContentView: View {
                         )
                         .padding(.horizontal, 20)
                         .onChange(of: inputJSON) { _, _ in
-                            // Auto-generate when JSON changes
-                            if !inputJSON.isEmpty && !className.isEmpty {
-                                generateCodeWithAI()
-                            }
+                            // Clear generated code when JSON changes
+                            generatedCode = ""
+                            isUsingFallback = false
                         }
                 }
                 .frame(maxHeight: 420)
@@ -380,8 +382,8 @@ struct ContentView: View {
             "tags": ["developer", "swift", "ios"]
         }
         """
-        // Auto-generate sample code
-        generateCodeWithAI()
+        generatedCode = ""
+        isUsingFallback = false
     }
     
 }

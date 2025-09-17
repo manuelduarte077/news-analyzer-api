@@ -16,7 +16,7 @@ struct SyntaxHighlighter: View {
     var body: some View {
         ScrollView {
             Text(highlightedCode)
-                .font(.system(size: 18, weight: .regular, design: .monospaced))
+                .font(.system(size: 22, weight: .regular, design: .monospaced))
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(12)
