@@ -16,7 +16,7 @@ struct SyntaxHighlighter: View {
     var body: some View {
         ScrollView {
             Text(highlightedCode)
-                .font(.system(.caption, design: .monospaced))
+                .font(.system(size: 18, weight: .regular, design: .monospaced))
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(12)
@@ -226,7 +226,7 @@ struct SyntaxHighlighter: View {
                 let endIndex = result.index(startIndex, offsetByCharacters: match.range.length)
                 
                 result[startIndex..<endIndex].foregroundColor = color
-                result[startIndex..<endIndex].font = .system(.caption, design: .monospaced).weight(weight)
+                result[startIndex..<endIndex].font = .system(size: 16, weight: weight, design: .monospaced)
             }
         } catch {
             // If regex fails, return original string

@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var isGenerating = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var isUsingFallback = false
     
     var body: some View {
         NavigationSplitView {
@@ -177,7 +178,7 @@ struct ContentView: View {
                     .padding(.top, 20)
                     
                     TextEditor(text: $inputJSON)
-                        .font(.system(.body, design: .monospaced))
+                        .font(.system(size: 18, weight: .regular, design: .monospaced))
                         .padding(12)
                         .background(Color(.textBackgroundColor))
                         .overlay(
@@ -192,7 +193,7 @@ struct ContentView: View {
                             }
                         }
                 }
-                .frame(maxHeight: 300)
+                .frame(maxHeight: 420)
                 
                 Divider()
                 
@@ -218,9 +219,18 @@ struct ContentView: View {
                                         .foregroundColor(.secondary)
                                 }
                             } else {
-                                Text("\(selectedLanguage.rawValue) • \(generatedCode.components(separatedBy: .newlines).count) lines")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                HStack(spacing: 8) {
+                                    Text("\(selectedLanguage.rawValue) • \(generatedCode.components(separatedBy: .newlines).count) lines")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    
+                                    if isUsingFallback {
+                                        Text("(Fallback)")
+                                            .font(.caption)
+                                            .foregroundColor(.orange)
+                                            .fontWeight(.medium)
+                                    }
+                                }
                             }
                         }
                         
@@ -318,11 +328,29 @@ struct ContentView: View {
                 await MainActor.run {
                     generatedCode = aiGeneratedCode
                     isGenerating = false
+                    isUsingFallback = false
                 }
             } catch {
                 await MainActor.run {
                     isGenerating = false
-                    errorMessage = "AI generation failed: \(error.localizedDescription)"
+                    isUsingFallback = true
+                    
+                    // Try to get a more specific error message
+                    if let nsError = error as? NSError {
+                        errorMessage = nsError.localizedDescription
+                    } else {
+                        errorMessage = "AI generation failed: \(error.localizedDescription)"
+                    }
+                    
+                    // Generate fallback code
+                    let firebaseManager = FirebaseManager.shared
+                    let fallbackCode = firebaseManager.generateFallbackCode(
+                        jsonDescription: inputJSON,
+                        language: selectedLanguage.rawValue,
+                        className: className
+                    )
+                    generatedCode = fallbackCode
+                    
                     showError = true
                 }
             }
