@@ -34,12 +34,7 @@ func main() {
 	favoritesRepository := favoritesRepo.NewRepository(database)
 
 	// Initialize external adapters
-	analyzer, err := analyzerAdapter.NewAdapter()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to initialize analyzer: %v\n", err)
-		os.Exit(1)
-	}
-
+	analyzer := analyzerAdapter.MustNewAdapter()
 	extractor := extractorAdapter.NewAdapter(nil)
 
 	// Initialize services

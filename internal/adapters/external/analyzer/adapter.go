@@ -42,6 +42,16 @@ func NewAdapter() (external.Analyzer, error) {
 	return &adapter{client: client}, nil
 }
 
+// MustNewAdapter creates a new analyzer adapter instance and panics if initialization fails.
+// This is a convenience function for applications that want to fail fast on analyzer initialization errors.
+func MustNewAdapter() external.Analyzer {
+	adapter, err := NewAdapter()
+	if err != nil {
+		panic(fmt.Sprintf("Failed to initialize analyzer: %v", err))
+	}
+	return adapter
+}
+
 // Analyze performs the analysis of the given text using OpenAI's API.
 func (a *adapter) Analyze(ctx context.Context, text string) (analysis.Result, error) {
 	if text == "" {

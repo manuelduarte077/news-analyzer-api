@@ -59,7 +59,6 @@ The analysis will identify biases, risks, missing information, and provide quali
 }
 
 func printAnalysisResult(result interface{}) {
-	// Convert to JSON for pretty printing
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		fmt.Printf("Error formatting result: %v\n", err)
