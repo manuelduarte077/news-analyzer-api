@@ -4,7 +4,7 @@ POST http://127.0.0.1:8080/analyze
 Content-Type: application/json
 
 {
-  "url": "https://www.laprensani.com/2025/12/14/nacionales/3575501-ex-reos-politicos-culminan-maestria-en-ee-uu-y-resaltan-el-aporte-del-exilio-al-futuro-de-nicaragua"
+  "url": "https://www.bbc.com/mundo/articles/c04v167q67lo"
 }
 
 # Obtener primera página (10 items por defecto)
