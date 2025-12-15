@@ -43,6 +43,9 @@ func main() {
 
 	app.Post("/analyze", handlers.AnalyzeNews(svc))
 	app.Get("/history", handlers.GetHistory(svc))
+	app.Post("/favorites", handlers.SaveFavorite(svc))
+	app.Get("/favorites", handlers.GetFavorites(svc))
+	app.Delete("/favorites/:id", handlers.DeleteFavorite(svc))
 
 	port := os.Getenv("PORT")
 	if port == "" {

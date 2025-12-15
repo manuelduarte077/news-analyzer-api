@@ -20,3 +20,21 @@ Content-Type: application/json
 ### GET
 GET http://localhost:8080/history?page=1&page_size=20
 Content-Type: application/json
+
+### POST GET Favoritos
+
+### GET
+GET http://localhost:8080/favorites?page=1&page_size=10
+Content-Type: application/json
+
+### POST
+POST http://localhost:8080/favorites
+Content-Type: application/json
+
+{
+  "analysis_id": 1
+}
+
+### DELETE
+DELETE http://localhost:8080/favorites/1
+Content-Type: application/json
