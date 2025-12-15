@@ -1,9 +1,9 @@
 package db
 
 import (
-	"database/sql" // SQLite database/sql package
+	"database/sql"
 
-	_ "github.com/mattn/go-sqlite3" // SQLite driver
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // Init initializes the SQLite database and creates necessary tables.
