@@ -111,4 +111,3 @@ func (s *service) DeleteFavorite(ctx context.Context, id int64) error {
 
 	return nil
 }
-

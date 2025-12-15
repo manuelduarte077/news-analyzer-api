@@ -63,4 +63,3 @@ func (s *service) GetHistory(ctx context.Context, page, pageSize int) (history.R
 		TotalPages: totalPages,
 	}, nil
 }
-

@@ -4,7 +4,7 @@ POST http://127.0.0.1:8080/analyze
 Content-Type: application/json
 
 {
-  "url": "https://www.vivanicaragua.com.ni/2025/12/14/sociales/masaya-gradua-nuevos-tecnicos/"
+  "url": "https://www.laprensani.com/2025/12/14/nacionales/3575501-ex-reos-politicos-culminan-maestria-en-ee-uu-y-resaltan-el-aporte-del-exilio-al-futuro-de-nicaragua"
 }
 
 # Obtener primera página (10 items por defecto)
@@ -21,8 +21,7 @@ Content-Type: application/json
 GET http://localhost:8080/history?page=1&page_size=20
 Content-Type: application/json
 
-### POST GET Favoritos
-
+## POST GET Favoritos
 ### GET
 GET http://localhost:8080/favorites?page=1&page_size=10
 Content-Type: application/json

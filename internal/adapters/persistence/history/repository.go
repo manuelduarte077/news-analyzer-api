@@ -49,4 +49,3 @@ func (r *repository) GetHistory(ctx context.Context, limit, offset int) ([]histo
 
 	return entries, total, nil
 }
-

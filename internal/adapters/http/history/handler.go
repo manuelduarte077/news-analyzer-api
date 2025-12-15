@@ -51,4 +51,3 @@ func (h *Handler) GetHistory() fiber.Handler {
 		return c.JSON(result)
 	}
 }
-

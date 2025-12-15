@@ -16,4 +16,3 @@ type Result struct {
 	MissingInfo []string `json:"missing_info"`
 	Scores      Scores   `json:"scores"`
 }
-

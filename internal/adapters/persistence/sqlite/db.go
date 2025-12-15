@@ -37,4 +37,3 @@ func Init() (*sql.DB, error) {
 	_, err = db.Exec(schema)
 	return db, err
 }
-

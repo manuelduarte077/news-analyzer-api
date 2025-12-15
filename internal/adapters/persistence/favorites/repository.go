@@ -117,4 +117,3 @@ func (r *repository) DeleteFavorite(ctx context.Context, id int64) (bool, error)
 
 	return rowsAffected > 0, nil
 }
-

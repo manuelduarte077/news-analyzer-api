@@ -15,4 +15,3 @@ type Entry struct {
 	Result    string
 	CreatedAt string
 }
-

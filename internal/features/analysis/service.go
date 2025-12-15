@@ -83,4 +83,3 @@ func computeHash(text string) string {
 	hashBytes := sha256.Sum256([]byte(text))
 	return hex.EncodeToString(hashBytes[:])
 }
-

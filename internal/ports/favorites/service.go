@@ -20,4 +20,3 @@ type Service interface {
 	// Returns any error encountered.
 	DeleteFavorite(ctx context.Context, id int64) error
 }
-

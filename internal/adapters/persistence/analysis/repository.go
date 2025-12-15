@@ -52,4 +52,3 @@ func (r *repository) FindByID(ctx context.Context, id int64) (analysis.Entry, bo
 	err := row.Scan(&entry.ID, &entry.Result, &entry.CreatedAt)
 	return entry, err == nil
 }
-

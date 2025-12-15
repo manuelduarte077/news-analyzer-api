@@ -9,4 +9,3 @@ type Extractor interface {
 	// It fetches the HTML, parses it, and extracts text from paragraph elements.
 	FromURL(ctx context.Context, url string) (string, error)
 }
-

@@ -13,4 +13,3 @@ type Analyzer interface {
 	// It returns a structured analysis result with summary, biases, risks, and scores.
 	Analyze(ctx context.Context, text string) (analysis.Result, error)
 }
-
