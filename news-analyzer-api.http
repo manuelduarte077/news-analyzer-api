@@ -1,0 +1,8 @@
+### POST
+
+POST http://127.0.0.1:8080/analyze
+Content-Type: application/json
+
+{
+  "url": "https://www.vivanicaragua.com.ni/2025/12/14/internacionales/alba-21-aniversario-unidad/"
+}
