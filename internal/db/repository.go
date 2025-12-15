@@ -1,17 +1,40 @@
 package db
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
-func Save(db *sql.DB, hash string, result string) error {
-	_, err := db.Exec(
+// Repository defines the interface for data persistence operations.
+type Repository interface {
+	Save(ctx context.Context, hash string, result string) error
+	FindByHash(ctx context.Context, hash string) (string, bool)
+}
+
+type repository struct {
+	db *sql.DB
+}
+
+// NewRepository creates a new repository instance.
+func NewRepository(db *sql.DB) Repository {
+	return &repository{db: db}
+}
+
+// Save stores an analysis result in the database.
+func (r *repository) Save(ctx context.Context, hash string, result string) error {
+	_, err := r.db.ExecContext(ctx,
 		"INSERT OR IGNORE INTO analysis (input_hash, result) VALUES (?, ?)",
 		hash, result,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func FindByHash(db *sql.DB, hash string) (string, bool) {
-	row := db.QueryRow(
+// FindByHash retrieves an analysis result by its hash.
+func (r *repository) FindByHash(ctx context.Context, hash string) (string, bool) {
+	row := r.db.QueryRowContext(ctx,
 		"SELECT result FROM analysis WHERE input_hash = ?",
 		hash,
 	)

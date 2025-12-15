@@ -1,6 +1,7 @@
 package extractor
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,35 +10,51 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var httpClient = &http.Client{
+// Extractor defines the interface for content extraction operations.
+type Extractor interface {
+	FromURL(ctx context.Context, url string) (string, error)
+}
+
+type extractor struct {
+	client *http.Client
+}
+
+var defaultHTTPClient = &http.Client{
 	Timeout: 30 * time.Second,
 }
 
+// NewExtractor creates a new extractor instance.
+func NewExtractor(client *http.Client) Extractor {
+	if client == nil {
+		client = defaultHTTPClient
+	}
+	return &extractor{client: client}
+}
+
+// HTTPError represents an error that occurred during an HTTP request.
+type HTTPError struct {
+	StatusCode int
+	URL        string
+}
+
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("HTTP error %d when fetching %s", e.StatusCode, e.URL)
+}
+
 // FromURL extracts text content from a web page at the given URL.
-// It fetches the HTML document from the URL, parses it, and extracts text
-// from paragraph elements within article tags (<article p>).
-//
-// Parameters:
-//   - url: The URL of the web page to extract content from
-//
-// Returns:
-//   - string: The extracted text content, with paragraphs separated by newlines
-//   - error: An error if the HTTP request fails, the document cannot be parsed,
-//     or if extraction fails
-func FromURL(url string) (string, error) {
-	req, err := http.NewRequest("GET", url, nil)
+func (e *extractor) FromURL(ctx context.Context, url string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
-	resp, err := httpClient.Do(req)
+	resp, err := e.client.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to fetch URL: %w", err)
 	}
 	defer resp.Body.Close()
 
-	// Check if the response status is successful
 	if resp.StatusCode != http.StatusOK {
 		return "", &HTTPError{
 			StatusCode: resp.StatusCode,
@@ -45,10 +62,9 @@ func FromURL(url string) (string, error) {
 		}
 	}
 
-	// Parse the HTML document
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to parse HTML: %w", err)
 	}
 
 	var text strings.Builder
@@ -69,15 +85,10 @@ func FromURL(url string) (string, error) {
 		}
 	}
 
-	return strings.TrimSpace(text.String()), nil
-}
+	result := strings.TrimSpace(text.String())
+	if result == "" {
+		return "", fmt.Errorf("no content extracted from URL: %s", url)
+	}
 
-// HTTPError represents an error that occurred during an HTTP request.
-type HTTPError struct {
-	StatusCode int
-	URL        string
-}
-
-func (e *HTTPError) Error() string {
-	return fmt.Sprintf("HTTP error %d when fetching %s", e.StatusCode, e.URL)
+	return result, nil
 }

@@ -8,10 +8,20 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/manuelduarte077/news-analyzer-api/internal/models"
 	openai "github.com/sashabaranov/go-openai"
 )
+
+// Analyzer defines the interface for text analysis operations.
+type Analyzer interface {
+	Analyze(ctx context.Context, text string) (models.AnalysisResult, error)
+}
+
+type analyzer struct {
+	client *openai.Client
+}
 
 var (
 	clientOnce       sync.Once
@@ -22,35 +32,31 @@ var (
 	spaceRegex       = regexp.MustCompile(`\s+`)
 )
 
-// Analyze performs the analysis of the given text using OpenAI's API.
-//
-// Parameters:
-//   - text: The text content of the news article to analyze
-//
-// Returns:
-//   - models.AnalysisResult: The structured analysis result
-//   - error: An error if the analysis fails
-func getClient() (*openai.Client, error) {
-	var err error
-	clientOnce.Do(func() {
-		apiKey := os.Getenv("OPENAI_API_KEY")
-		if apiKey == "" {
-			err = fmt.Errorf("OPENAI_API_KEY environment variable is not set")
-			return
-		}
-		client = openai.NewClient(apiKey)
-	})
-	return client, err
-}
-
-func Analyze(text string) (models.AnalysisResult, error) {
-	client, err := getClient()
-	if err != nil {
-		return models.AnalysisResult{}, err
+// NewAnalyzer creates a new analyzer instance.
+func NewAnalyzer() (Analyzer, error) {
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	if apiKey == "" {
+		return nil, fmt.Errorf("OPENAI_API_KEY environment variable is not set")
 	}
 
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
+	clientOnce.Do(func() {
+		client = openai.NewClient(apiKey)
+	})
+
+	return &analyzer{client: client}, nil
+}
+
+// Analyze performs the analysis of the given text using OpenAI's API.
+func (a *analyzer) Analyze(ctx context.Context, text string) (models.AnalysisResult, error) {
+	if text == "" {
+		return models.AnalysisResult{}, fmt.Errorf("text cannot be empty")
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	resp, err := a.client.CreateChatCompletion(
+		ctx,
 		openai.ChatCompletionRequest{
 			Model: openai.GPT4oMini,
 			Messages: []openai.ChatCompletionMessage{
@@ -61,10 +67,9 @@ func Analyze(text string) (models.AnalysisResult, error) {
 		},
 	)
 	if err != nil {
-		return models.AnalysisResult{}, err
+		return models.AnalysisResult{}, fmt.Errorf("OpenAI API error: %w", err)
 	}
 
-	// Check if we have any choices in the response
 	if len(resp.Choices) == 0 {
 		return models.AnalysisResult{}, fmt.Errorf("OpenAI API returned no choices")
 	}
@@ -80,15 +85,12 @@ func Analyze(text string) (models.AnalysisResult, error) {
 		Scores      models.Scores `json:"scores"`
 	}
 
-	// Parse the JSON response
 	if err := json.Unmarshal([]byte(cleanedContent), &flexibleResult); err != nil {
-		return models.AnalysisResult{}, fmt.Errorf("failed to parse OpenAI response as JSON: %w. Response content: %s", err, cleanedContent)
+		return models.AnalysisResult{}, fmt.Errorf("failed to parse OpenAI response as JSON: %w", err)
 	}
 
-	// Normalize summary field (convert string to []string if needed)
 	summary := normalizeSummary(flexibleResult.Summary)
 
-	// Build the final result
 	result := models.AnalysisResult{
 		Summary:     summary,
 		Biases:      flexibleResult.Biases,
