@@ -27,7 +27,6 @@ func main() {
 	}
 
 	extractorSvc := extractor.NewExtractor(nil)
-
 	svc := service.NewService(analyzerSvc, extractorSvc, repo)
 
 	app := fiber.New(fiber.Config{
@@ -43,6 +42,7 @@ func main() {
 	})
 
 	app.Post("/analyze", handlers.AnalyzeNews(svc))
+	app.Get("/history", handlers.GetHistory(svc))
 
 	port := os.Getenv("PORT")
 	if port == "" {

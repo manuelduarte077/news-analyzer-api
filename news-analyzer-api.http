@@ -4,5 +4,19 @@ POST http://127.0.0.1:8080/analyze
 Content-Type: application/json
 
 {
-  "url": "https://www.vivanicaragua.com.ni/2025/12/14/internacionales/alba-21-aniversario-unidad/"
+  "url": "https://www.vivanicaragua.com.ni/2025/12/14/sociales/masaya-gradua-nuevos-tecnicos/"
 }
+
+# Obtener primera página (10 items por defecto)
+### GET
+
+GET http://127.0.0.1:8080/history
+Content-Type: application/json
+
+### GET
+GET http://localhost:8080/history?page=2
+Content-Type: application/json
+
+### GET
+GET http://localhost:8080/history?page=1&page_size=20
+Content-Type: application/json
