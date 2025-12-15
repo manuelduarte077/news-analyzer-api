@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -10,12 +11,13 @@ import (
 func Init() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", "./data/news.db")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	// Enable foreign keys
 	if _, err := db.Exec("PRAGMA foreign_keys = ON"); err != nil {
-		return nil, err
+		db.Close()
+		return nil, fmt.Errorf("failed to enable foreign keys: %w", err)
 	}
 
 	schema := `
@@ -34,6 +36,20 @@ func Init() (*sql.DB, error) {
 		UNIQUE(analysis_id)
 	);`
 
-	_, err = db.Exec(schema)
-	return db, err
+	if _, err := db.Exec(schema); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to create schema: %w", err)
+	}
+
+	return db, nil
+}
+
+// MustInit initializes the SQLite database and panics if initialization fails.
+// This is a convenience function for applications that want to fail fast on database errors.
+func MustInit() *sql.DB {
+	db, err := Init()
+	if err != nil {
+		panic(fmt.Sprintf("Failed to initialize database: %v", err))
+	}
+	return db
 }

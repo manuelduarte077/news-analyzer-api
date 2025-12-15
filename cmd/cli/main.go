@@ -1,15 +1,12 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/manuelduarte077/news-analyzer-api/cmd/cli/commands"
 	analyzerAdapter "github.com/manuelduarte077/news-analyzer-api/internal/adapters/external/analyzer"
 	extractorAdapter "github.com/manuelduarte077/news-analyzer-api/internal/adapters/external/extractor"
-	analysisHandler "github.com/manuelduarte077/news-analyzer-api/internal/adapters/http/analysis"
-	favoritesHandler "github.com/manuelduarte077/news-analyzer-api/internal/adapters/http/favorites"
-	historyHandler "github.com/manuelduarte077/news-analyzer-api/internal/adapters/http/history"
 	analysisRepo "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/analysis"
 	favoritesRepo "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/favorites"
 	historyRepo "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/history"
@@ -17,9 +14,17 @@ import (
 	analysisService "github.com/manuelduarte077/news-analyzer-api/internal/features/analysis"
 	favoritesService "github.com/manuelduarte077/news-analyzer-api/internal/features/favorites"
 	historyService "github.com/manuelduarte077/news-analyzer-api/internal/features/history"
+	"github.com/spf13/cobra"
+)
+
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
 )
 
 func main() {
+	// Initialize database
 	database := sqliteDB.MustInit()
 	defer database.Close()
 
@@ -31,7 +36,8 @@ func main() {
 	// Initialize external adapters
 	analyzer, err := analyzerAdapter.NewAdapter()
 	if err != nil {
-		log.Fatalf("Failed to initialize analyzer: %v", err)
+		fmt.Fprintf(os.Stderr, "Failed to initialize analyzer: %v\n", err)
+		os.Exit(1)
 	}
 
 	extractor := extractorAdapter.NewAdapter(nil)
@@ -41,37 +47,22 @@ func main() {
 	historySvc := historyService.NewService(historyRepository)
 	favoritesSvc := favoritesService.NewService(analysisRepository, favoritesRepository)
 
-	// Initialize handlers
-	analysisHdl := analysisHandler.NewHandler(analysisSvc)
-	historyHdl := historyHandler.NewHandler(historySvc)
-	favoritesHdl := favoritesHandler.NewHandler(favoritesSvc)
-
-	app := fiber.New(fiber.Config{
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			code := fiber.StatusInternalServerError
-			if e, ok := err.(*fiber.Error); ok {
-				code = e.Code
-			}
-			return c.Status(code).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		},
-	})
-
-	// Register routes
-	app.Post("/analyze", analysisHdl.AnalyzeNews())
-	app.Get("/history", historyHdl.GetHistory())
-	app.Post("/favorites", favoritesHdl.SaveFavorite())
-	app.Get("/favorites", favoritesHdl.GetFavorites())
-	app.Delete("/favorites/:id", favoritesHdl.DeleteFavorite())
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	// Create root command
+	rootCmd := &cobra.Command{
+		Use:   "news-analyzer",
+		Short: "A CLI tool for analyzing news articles",
+		Long: `News Analyzer is a CLI tool that helps you analyze news articles
+by extracting content, identifying biases, risks, and providing quality scores.`,
+		Version: fmt.Sprintf("%s (commit: %s, built: %s)", version, commit, date),
 	}
 
-	log.Printf("Server starting on port %s", port)
-	if err := app.Listen(":" + port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	// Add commands
+	rootCmd.AddCommand(commands.NewAnalyzeCommand(analysisSvc))
+	rootCmd.AddCommand(commands.NewHistoryCommand(historySvc))
+	rootCmd.AddCommand(commands.NewFavoritesCommand(favoritesSvc))
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
 	}
 }
