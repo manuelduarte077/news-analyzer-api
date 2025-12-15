@@ -1,4 +1,4 @@
-package handlers
+package favorites
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/manuelduarte077/news-analyzer-api/internal/service"
+	"github.com/manuelduarte077/news-analyzer-api/internal/ports/favorites"
 )
 
 // SaveFavoriteRequest represents the request payload for saving a favorite.
@@ -14,9 +14,19 @@ type SaveFavoriteRequest struct {
 	AnalysisID int64 `json:"analysis_id"`
 }
 
+// Handler handles HTTP requests for favorites operations.
+type Handler struct {
+	service favorites.Service
+}
+
+// NewHandler creates a new favorites handler instance.
+func NewHandler(service favorites.Service) *Handler {
+	return &Handler{service: service}
+}
+
 // SaveFavorite handles saving an analysis result as a favorite.
 // It accepts a JSON payload with analysis_id.
-func SaveFavorite(svc service.Service) fiber.Handler {
+func (h *Handler) SaveFavorite() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req SaveFavoriteRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -32,7 +42,7 @@ func SaveFavorite(svc service.Service) fiber.Handler {
 			})
 		}
 
-		favorite, err := svc.SaveFavorite(c.Context(), req.AnalysisID)
+		favorite, err := h.service.SaveFavorite(c.Context(), req.AnalysisID)
 		if err != nil {
 			log.Printf("Error saving favorite: %v", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -47,7 +57,7 @@ func SaveFavorite(svc service.Service) fiber.Handler {
 
 // GetFavorites handles the retrieval of favorites.
 // It accepts optional query parameters: page (default: 1) and page_size (default: 10, max: 100).
-func GetFavorites(svc service.Service) fiber.Handler {
+func (h *Handler) GetFavorites() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		pageStr := c.Query("page", "1")
 		pageSizeStr := c.Query("page_size", "10")
@@ -66,7 +76,7 @@ func GetFavorites(svc service.Service) fiber.Handler {
 			})
 		}
 
-		result, err := svc.GetFavorites(c.Context(), page, pageSize)
+		result, err := h.service.GetFavorites(c.Context(), page, pageSize)
 		if err != nil {
 			log.Printf("Error retrieving favorites: %v", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -81,7 +91,7 @@ func GetFavorites(svc service.Service) fiber.Handler {
 
 // DeleteFavorite handles the deletion of a favorite.
 // It accepts the favorite ID as a URL parameter.
-func DeleteFavorite(svc service.Service) fiber.Handler {
+func (h *Handler) DeleteFavorite() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idStr := c.Params("id")
 		if idStr == "" {
@@ -97,7 +107,7 @@ func DeleteFavorite(svc service.Service) fiber.Handler {
 			})
 		}
 
-		if err := svc.DeleteFavorite(c.Context(), id); err != nil {
+		if err := h.service.DeleteFavorite(c.Context(), id); err != nil {
 			log.Printf("Error deleting favorite: %v", err)
 			statusCode := fiber.StatusInternalServerError
 			if strings.Contains(err.Error(), "not found") {
@@ -112,4 +122,3 @@ func DeleteFavorite(svc service.Service) fiber.Handler {
 		return c.Status(fiber.StatusNoContent).Send(nil)
 	}
 }
-

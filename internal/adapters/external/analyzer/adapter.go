@@ -10,19 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/manuelduarte077/news-analyzer-api/internal/models"
+	"github.com/manuelduarte077/news-analyzer-api/internal/domain/analysis"
+	"github.com/manuelduarte077/news-analyzer-api/internal/ports/external"
 	openai "github.com/sashabaranov/go-openai"
 )
 
-// Analyzer defines the interface for text analysis operations.
-// It provides methods for analyzing news article content using AI.
-type Analyzer interface {
-	// Analyze performs the analysis of the given text using OpenAI's API.
-	// It returns a structured analysis result with summary, biases, risks, and scores.
-	Analyze(ctx context.Context, text string) (models.AnalysisResult, error)
-}
-
-type analyzer struct {
+type adapter struct {
 	client *openai.Client
 }
 
@@ -35,8 +28,8 @@ var (
 	spaceRegex       = regexp.MustCompile(`\s+`)
 )
 
-// NewAnalyzer creates a new analyzer instance.
-func NewAnalyzer() (Analyzer, error) {
+// NewAdapter creates a new analyzer adapter instance.
+func NewAdapter() (external.Analyzer, error) {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
 		return nil, fmt.Errorf("OPENAI_API_KEY environment variable is not set")
@@ -46,13 +39,13 @@ func NewAnalyzer() (Analyzer, error) {
 		client = openai.NewClient(apiKey)
 	})
 
-	return &analyzer{client: client}, nil
+	return &adapter{client: client}, nil
 }
 
 // Analyze performs the analysis of the given text using OpenAI's API.
-func (a *analyzer) Analyze(ctx context.Context, text string) (models.AnalysisResult, error) {
+func (a *adapter) Analyze(ctx context.Context, text string) (analysis.Result, error) {
 	if text == "" {
-		return models.AnalysisResult{}, fmt.Errorf("text cannot be empty")
+		return analysis.Result{}, fmt.Errorf("text cannot be empty")
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
@@ -64,37 +57,37 @@ func (a *analyzer) Analyze(ctx context.Context, text string) (models.AnalysisRes
 			Model: openai.GPT4oMini,
 			Messages: []openai.ChatCompletionMessage{
 				{Role: "system", Content: "Analista experto en noticias."},
-				{Role: "user", Content: BuildPrompt(text)},
+				{Role: "user", Content: buildPrompt(text)},
 			},
 			Temperature: 0.25,
 		},
 	)
 	if err != nil {
-		return models.AnalysisResult{}, fmt.Errorf("OpenAI API error: %w", err)
+		return analysis.Result{}, fmt.Errorf("OpenAI API error: %w", err)
 	}
 
 	if len(resp.Choices) == 0 {
-		return models.AnalysisResult{}, fmt.Errorf("OpenAI API returned no choices")
+		return analysis.Result{}, fmt.Errorf("OpenAI API returned no choices")
 	}
 
 	content := resp.Choices[0].Message.Content
 	cleanedContent := cleanJSON(content)
 
 	var flexibleResult struct {
-		Summary     interface{}   `json:"summary"`
-		Biases      []string      `json:"biases"`
-		Risks       []string      `json:"risks"`
-		MissingInfo []string      `json:"missing_info"`
-		Scores      models.Scores `json:"scores"`
+		Summary     interface{}     `json:"summary"`
+		Biases      []string        `json:"biases"`
+		Risks       []string        `json:"risks"`
+		MissingInfo []string        `json:"missing_info"`
+		Scores      analysis.Scores `json:"scores"`
 	}
 
 	if err := json.Unmarshal([]byte(cleanedContent), &flexibleResult); err != nil {
-		return models.AnalysisResult{}, fmt.Errorf("failed to parse OpenAI response as JSON: %w", err)
+		return analysis.Result{}, fmt.Errorf("failed to parse OpenAI response as JSON: %w", err)
 	}
 
 	summary := normalizeSummary(flexibleResult.Summary)
 
-	result := models.AnalysisResult{
+	result := analysis.Result{
 		Summary:     summary,
 		Biases:      flexibleResult.Biases,
 		Risks:       flexibleResult.Risks,
@@ -140,4 +133,35 @@ func cleanJSON(jsonStr string) string {
 	jsonStr = spaceRegex.ReplaceAllString(jsonStr, " ")
 
 	return jsonStr
+}
+
+func buildPrompt(text string) string {
+	return `
+Eres un analista profesional de medios.
+
+Reglas:
+- No inventes información
+- Sé neutral
+- Señala incertidumbres
+
+Devuelve SOLO JSON con esta estructura:
+
+{
+  "summary": [string],
+  "biases": [string],
+  "risks": [string],
+  "missing_info": [string],
+  "scores": {
+    "objectivity": number,
+    "clarity": number,
+    "source_quality": number,
+    "overall": number
+  }
+}
+
+Noticia:
+"""
+` + text + `
+"""
+`
 }

@@ -5,29 +5,49 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/manuelduarte077/news-analyzer-api/internal/analyzer"
-	"github.com/manuelduarte077/news-analyzer-api/internal/db"
-	"github.com/manuelduarte077/news-analyzer-api/internal/extractor"
-	"github.com/manuelduarte077/news-analyzer-api/internal/handlers"
-	"github.com/manuelduarte077/news-analyzer-api/internal/service"
+	analyzerAdapter "github.com/manuelduarte077/news-analyzer-api/internal/adapters/external/analyzer"
+	extractorAdapter "github.com/manuelduarte077/news-analyzer-api/internal/adapters/external/extractor"
+	analysisHandler "github.com/manuelduarte077/news-analyzer-api/internal/adapters/http/analysis"
+	favoritesHandler "github.com/manuelduarte077/news-analyzer-api/internal/adapters/http/favorites"
+	historyHandler "github.com/manuelduarte077/news-analyzer-api/internal/adapters/http/history"
+	analysisRepo "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/analysis"
+	favoritesRepo "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/favorites"
+	historyRepo "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/history"
+	sqliteDB "github.com/manuelduarte077/news-analyzer-api/internal/adapters/persistence/sqlite"
+	analysisService "github.com/manuelduarte077/news-analyzer-api/internal/features/analysis"
+	favoritesService "github.com/manuelduarte077/news-analyzer-api/internal/features/favorites"
+	historyService "github.com/manuelduarte077/news-analyzer-api/internal/features/history"
 )
 
 func main() {
-	database, err := db.Init()
+	database, err := sqliteDB.Init()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer database.Close()
 
-	repo := db.NewRepository(database)
+	// Initialize repositories
+	analysisRepository := analysisRepo.NewRepository(database)
+	historyRepository := historyRepo.NewRepository(database)
+	favoritesRepository := favoritesRepo.NewRepository(database)
 
-	analyzerSvc, err := analyzer.NewAnalyzer()
+	// Initialize external adapters
+	analyzer, err := analyzerAdapter.NewAdapter()
 	if err != nil {
 		log.Fatalf("Failed to initialize analyzer: %v", err)
 	}
 
-	extractorSvc := extractor.NewExtractor(nil)
-	svc := service.NewService(analyzerSvc, extractorSvc, repo)
+	extractor := extractorAdapter.NewAdapter(nil)
+
+	// Initialize services
+	analysisSvc := analysisService.NewService(analyzer, extractor, analysisRepository)
+	historySvc := historyService.NewService(historyRepository)
+	favoritesSvc := favoritesService.NewService(analysisRepository, favoritesRepository)
+
+	// Initialize handlers
+	analysisHdl := analysisHandler.NewHandler(analysisSvc)
+	historyHdl := historyHandler.NewHandler(historySvc)
+	favoritesHdl := favoritesHandler.NewHandler(favoritesSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
@@ -41,11 +61,12 @@ func main() {
 		},
 	})
 
-	app.Post("/analyze", handlers.AnalyzeNews(svc))
-	app.Get("/history", handlers.GetHistory(svc))
-	app.Post("/favorites", handlers.SaveFavorite(svc))
-	app.Get("/favorites", handlers.GetFavorites(svc))
-	app.Delete("/favorites/:id", handlers.DeleteFavorite(svc))
+	// Register routes
+	app.Post("/analyze", analysisHdl.AnalyzeNews())
+	app.Get("/history", historyHdl.GetHistory())
+	app.Post("/favorites", favoritesHdl.SaveFavorite())
+	app.Get("/favorites", favoritesHdl.GetFavorites())
+	app.Delete("/favorites/:id", favoritesHdl.DeleteFavorite())
 
 	port := os.Getenv("PORT")
 	if port == "" {

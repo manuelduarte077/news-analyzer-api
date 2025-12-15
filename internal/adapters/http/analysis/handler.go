@@ -1,4 +1,4 @@
-package handlers
+package analysis
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/manuelduarte077/news-analyzer-api/internal/service"
+	"github.com/manuelduarte077/news-analyzer-api/internal/ports/analysis"
 )
 
 // Request represents the analysis request payload.
@@ -15,9 +15,19 @@ type Request struct {
 	Text string `json:"text"`
 }
 
+// Handler handles HTTP requests for analysis operations.
+type Handler struct {
+	service analysis.Service
+}
+
+// NewHandler creates a new analysis handler instance.
+func NewHandler(service analysis.Service) *Handler {
+	return &Handler{service: service}
+}
+
 // AnalyzeNews handles the analysis of news articles.
 // It accepts a JSON payload with either a URL or raw text.
-func AnalyzeNews(svc service.Service) fiber.Handler {
+func (h *Handler) AnalyzeNews() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req Request
 		if err := c.BodyParser(&req); err != nil {
@@ -46,7 +56,7 @@ func AnalyzeNews(svc service.Service) fiber.Handler {
 			}
 		}
 
-		result, err := svc.AnalyzeNews(c.Context(), req.URL, req.Text)
+		result, err := h.service.AnalyzeNews(c.Context(), req.URL, req.Text)
 		if err != nil {
 			log.Printf("Error analyzing news: %v", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

@@ -8,17 +8,10 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/manuelduarte077/news-analyzer-api/internal/ports/external"
 )
 
-// Extractor defines the interface for content extraction operations.
-// It provides methods for extracting text content from web pages.
-type Extractor interface {
-	// FromURL extracts text content from a web page at the given URL.
-	// It fetches the HTML, parses it, and extracts text from paragraph elements.
-	FromURL(ctx context.Context, url string) (string, error)
-}
-
-type extractor struct {
+type adapter struct {
 	client *http.Client
 }
 
@@ -26,12 +19,12 @@ var defaultHTTPClient = &http.Client{
 	Timeout: 30 * time.Second,
 }
 
-// NewExtractor creates a new extractor instance.
-func NewExtractor(client *http.Client) Extractor {
+// NewAdapter creates a new extractor adapter instance.
+func NewAdapter(client *http.Client) external.Extractor {
 	if client == nil {
 		client = defaultHTTPClient
 	}
-	return &extractor{client: client}
+	return &adapter{client: client}
 }
 
 // HTTPError represents an error that occurred during an HTTP request.
@@ -45,14 +38,14 @@ func (e *HTTPError) Error() string {
 }
 
 // FromURL extracts text content from a web page at the given URL.
-func (e *extractor) FromURL(ctx context.Context, url string) (string, error) {
+func (a *adapter) FromURL(ctx context.Context, url string) (string, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
-	resp, err := e.client.Do(req)
+	resp, err := a.client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch URL: %w", err)
 	}
