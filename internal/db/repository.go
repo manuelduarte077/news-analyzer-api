@@ -3,12 +3,21 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 // Repository defines the interface for data persistence operations.
+// It provides methods for storing and retrieving analysis results.
 type Repository interface {
+	// Save stores an analysis result in the database using the provided hash as key.
 	Save(ctx context.Context, hash string, result string) error
+
+	// FindByHash retrieves an analysis result by its hash.
+	// Returns the result and a boolean indicating if it was found.
 	FindByHash(ctx context.Context, hash string) (string, bool)
+
+	// GetHistory retrieves paginated analysis history.
+	// Returns entries, total count, and any error encountered.
 	GetHistory(ctx context.Context, limit, offset int) ([]HistoryEntry, int, error)
 }
 
@@ -35,7 +44,7 @@ func (r *repository) Save(ctx context.Context, hash string, result string) error
 		hash, result,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save analysis result: %w", err)
 	}
 	return nil
 }
@@ -57,7 +66,7 @@ func (r *repository) GetHistory(ctx context.Context, limit, offset int) ([]Histo
 	var total int
 	err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM analysis").Scan(&total)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("failed to count history entries: %w", err)
 	}
 
 	rows, err := r.db.QueryContext(ctx,
@@ -65,7 +74,7 @@ func (r *repository) GetHistory(ctx context.Context, limit, offset int) ([]Histo
 		limit, offset,
 	)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("failed to query history entries: %w", err)
 	}
 	defer rows.Close()
 
@@ -73,13 +82,13 @@ func (r *repository) GetHistory(ctx context.Context, limit, offset int) ([]Histo
 	for rows.Next() {
 		var entry HistoryEntry
 		if err := rows.Scan(&entry.ID, &entry.Result, &entry.CreatedAt); err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("failed to scan history entry: %w", err)
 		}
 		entries = append(entries, entry)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("error iterating history rows: %w", err)
 	}
 
 	return entries, total, nil

@@ -14,8 +14,14 @@ import (
 )
 
 // Service defines the interface for the analysis service.
+// It provides methods for analyzing news articles and retrieving analysis history.
 type Service interface {
+	// AnalyzeNews processes a news article analysis request.
+	// It accepts either a URL or raw text content for analysis.
 	AnalyzeNews(ctx context.Context, url, text string) (models.AnalysisResult, error)
+
+	// GetHistory retrieves paginated analysis history.
+	// Page and pageSize are validated and normalized (page >= 1, pageSize 1-100).
 	GetHistory(ctx context.Context, page, pageSize int) (models.HistoryResponse, error)
 }
 
